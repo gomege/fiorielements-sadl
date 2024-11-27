@@ -4,6 +4,7 @@
   <asx:values>
    <DEVC>
     <CTEXT>creation of CDS based on UX403 and synch with github</CTEXT>
+    <PACKKIND>5</PACKKIND>
    </DEVC>
   </asx:values>
  </asx:abap>
