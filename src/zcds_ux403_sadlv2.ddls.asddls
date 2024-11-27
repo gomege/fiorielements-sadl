@@ -5,7 +5,7 @@
 @UI.headerInfo.typeNamePlural: 'SalesOrders'
 @UI.headerInfo.title.value: 'SalesOrderID'
 @EndUserText.label: 'UX403 Generate OData Service by SADL'
-
+@OData.publish: true
 define view ZCDS_UX403_SADL_00 as select from SEPM_I_SalesOrder
 {
     @UI.lineItem.position: 10 
