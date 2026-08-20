@@ -1,0 +1,43 @@
+@Metadata.layer: #CORE
+@UI.headerInfo: {
+  typeName: 'Sales Order',
+  typeNamePlural: 'Sales Orders',
+  title: {
+    type: #STANDARD,
+    value: 'SalesOrderID'
+  }
+}
+annotate view ZCDS_UX403_SADL_00 with
+{
+  @UI.lineItem: [
+    {
+      position: 10,
+      importance: #HIGH
+    }
+  ]
+  SalesOrderID;
+
+  @UI.lineItem: [
+    {
+      position: 20,
+      importance: #HIGH
+    }
+  ]
+  CustomerID;
+
+  @UI.lineItem: [
+    {
+      position: 30,
+      importance: #HIGH
+    }
+  ]
+  CustomerName;
+
+  @UI.lineItem: [
+    {
+      position: 40,
+      importance: #HIGH
+    }
+  ]
+  GrossAmount;
+}
