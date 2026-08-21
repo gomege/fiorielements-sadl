@@ -24,6 +24,9 @@ define view ZCDS_UX403_SADL_00
 
       NetAmountInTransactionCurrency     as NetAmount,
 
+      TransactionCurrency as CurrencyCode,
+
+      @Semantics.amount.currencyCode: 'CurrencyCode'
       GrossAmountInTransacCurrency
         - NetAmountInTransactionCurrency as TaxAmount
 }

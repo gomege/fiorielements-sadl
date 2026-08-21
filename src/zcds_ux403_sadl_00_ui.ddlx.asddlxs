@@ -27,6 +27,6 @@ annotate view ZCDS_UX403_SADL_00 with
   NetAmount;
 
 
-  @UI.lineItem: [ { position: 60, importance: #HIGH, label: 'Tax Amount' } ]
+  @UI.lineItem: [ { position: 60, importance: #LOW, label: 'Tax Amount' } ]
   TaxAmount;
 }
