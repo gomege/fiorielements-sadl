@@ -10,12 +10,23 @@ annotate view ZCDS_UX403_SADL_00 with
   @UI.lineItem: [ { position: 10, importance: #HIGH, label: 'Sales Order ID' } ]
   SalesOrderID;
 
+
   @UI.lineItem: [ { position: 20, importance: #HIGH, label: 'BP ID' } ]
   CustomerID;
+
 
   @UI.lineItem: [ { position: 30, importance: #HIGH, label: 'Company Name' } ]
   CustomerName;
 
+
   @UI.lineItem: [ { position: 40, importance: #HIGH, label: 'Gross Amount' } ]
   GrossAmount;
-}
+
+
+  @UI.lineItem: [ { position: 50, importance: #HIGH, label: 'Net Amount' } ]
+  NetAmount;
+
+
+  @UI.lineItem: [ { position: 60, importance: #HIGH, label: 'Tax Amount' } ]
+  TaxAmount;
+}
