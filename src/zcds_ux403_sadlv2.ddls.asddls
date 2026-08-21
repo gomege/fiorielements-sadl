@@ -24,6 +24,7 @@ define view ZCDS_UX403_SADL_00
 
       NetAmountInTransactionCurrency     as NetAmount,
 
+      @UI.hidden: true
       TransactionCurrency as CurrencyCode,
 
       @Semantics.amount.currencyCode: 'CurrencyCode'
