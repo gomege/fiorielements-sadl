@@ -1,108 +1,35 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Guidance for Claude Code in this repository. Read `README.md` for the full project description. This file only adds what matters when working on the repo.
 
-## Project Overview
+## What this repo is
 
-This is a **SAP Fiori Elements project** based on **CDS (Core Data Services)** and synchronized with GitHub via **abapgit**. The repository contains CDS Views and metadata that generate OData services for SAP Fiori UI applications.
+- Practice repository for SAP UX403 (Fiori Elements on CDS/SADL) and for **abapGit round trips between two SAP systems** (company sandbox and IDES). Backend development can happen in either one.
+- **The SAP system is the source of truth.** Everything in `src/` is serialized by abapGit. **Do not edit, create, rename or delete files in `src/`.** Propose the change as ABAP/CDS source for the user to apply in ADT, then sync with abapGit.
+- Safe to edit directly: `README.md`, `CLAUDE.md` (root files outside the abapGit starting folder `/src/`).
+- The **Fiori Elements app is not in this repo**. It lives in SAP Business Application Studio. Don't look for `webapp/` or `manifest.json` here.
 
-**Key Technologies:**
-- **CDS Views** (.ddls files) - Core Data Services definitions for SADL (Service Adapter Layer)
-- **abapgit** - Version control bridge between SAP ABAP systems and GitHub
-- **OData Services** - Exposed through SADL with UI annotations
-- **Fiori Elements** - UI generation based on CDS metadata annotations
+## Branches
 
-## Repository Structure
+- One branch per exercise, each cut from the previous one (cumulative): `main` (Ex05 baseline) → `ux403-ex06-…` → `ux403-ex07-…` → `ux403-ex08-…` → ….
+- **The branch README is the status record** for that exercise (objective, objects, deviations, done/pending). Read it before working on a branch.
+- Exercise branches are not merged into `main`. Don't merge or rebase between branches unless the user asks.
+- The branch name `ux403-ex06-metadata-extention` contains a typo. Keep it, because other branches and abapGit links depend on it.
 
-```
-src/
-├── zcds_ux403_sadlv2.ddls.asddls    # CDS View definition (ABAP source)
-├── zcds_ux403_sadlv2.ddls.xml       # CDS View metadata (abapgit serialization)
-├── zcds_ux403_sadl_00_cds_*.iwvb.xml # View variant configurations
-├── zcds_ux403_sadl_00_cds_*.iwmo.xml # View model configurations
-├── zcds_ux403_sadl_00_cds_*.iwsv.xml # Service configurations
-└── package.devc.xml                 # Package definition metadata
-.abapgit.xml                         # abapgit repository configuration
-```
+## Objects (package `ZCODE_GIT_FIORIELEMENTS-SADL`)
 
-## Working with This Repository
+| Object | Kind | Source file |
+|---|---|---|
+| `ZCDS_UX403_SADL_00` | CDS view on `SEPM_I_SalesOrder`, `@OData.publish: true` | `src/zcds_ux403_sadlv2.ddls.asddls` (file name ≠ view name) |
+| `ZCDS_UX403_SADL_00_UI` | Metadata extension (from Ex06) | `src/zcds_ux403_sadl_00_ui.ddlx.asddlxs` |
+| `ZCDS_UX403_SADL_00_CDS` | SADL-generated OData service | `src/*.iwsv/.iwmo/.iwvb/.iwsg/.iwom.xml` (generated, never touch) |
 
-### Syncing with SAP Systems
+- **Where annotations go (from Ex06 on):** `@UI.*` belongs in the metadata extension. Data, search, value-help and semantic annotations (`@Search`, `@Consumption.valueHelp`, `@Semantics`) belong in the CDS view.
+- Some file names in `src/` contain padding spaces (e.g. `zcds_ux403_sadl_00_cds             0001.iwsv.xml`). Quote paths in shell commands.
+- The field list and annotations change per branch. Read the current `.asddls` / `.asddlxs` instead of relying on any list.
 
-This repository is synchronized via **abapgit**, which bridges GitHub and SAP ABAP systems:
+## Conventions
 
-1. **Pull from SAP** → **Push to GitHub**:
-   - In SAP system, use abapgit to pull changes from GitHub
-   - Developers make changes in SAP (via SE80, ADT, or similar)
-   - abapgit pushes changes back to GitHub
-
-2. **Push from GitHub** → **Pull into SAP**:
-   - Changes merged to GitHub's `main` branch
-   - In SAP system, use abapgit "Pull" to fetch the latest changes
-   - abapgit serializes objects into XML format automatically
-
-**Note:** Direct edits to files in this GitHub repo should be minimal—most changes happen in the SAP system and sync through abapgit.
-
-### Key Configuration Files
-
-- **`.abapgit.xml`**: Defines repository metadata
-  - `STARTING_FOLDER: /src/` — All objects start in the `src/` folder
-  - `FOLDER_LOGIC: PREFIX` — Folder structure is based on object name prefix
-  - `MASTER_LANGUAGE: E` — English
-
-### Understanding CDS Views
-
-CDS View: `ZCDS_UX403_SADL_00` (defined in `zcds_ux403_sadlv2.ddls.asddls`)
-
-**Key Annotations:**
-- `@Metadata.allowExtensions: true` — Allows extensions in derived views
-- `@OData.publish: true` — Exposes the view as an OData service
-- `@UI.` annotations — Define how Fiori Elements renders the UI
-  - `@UI.headerInfo` — Header section (title, type name)
-  - `@UI.lineItem` — Columns displayed in the list view
-  - `@Search.` — Search and indexing behavior
-  - `@EndUserText.label` — User-facing label
-
-**Example Structure:**
-The view selects from `SEPM_I_SalesOrder` and exposes:
-- `SalesOrderID` (key, position 10)
-- `CustomerID` (position 20)
-- `CustomerName` (position 30)
-- `GrossAmount` (position 40)
-
-The `position` field controls the column order in the Fiori Elements UI.
-
-### Common Development Tasks
-
-#### Adding a New Field to the CDS View
-1. Edit `src/zcds_ux403_sadlv2.ddls.asddls`:
-   - Add the field to the SELECT clause
-   - Include UI annotations (`@UI.lineItem.position`) to control visibility and order
-   - Add search annotations if needed (`@Search.defaultSearchElement`)
-
-2. Commit and push to GitHub
-
-3. In SAP system, pull changes via abapgit → test in Fiori Elements
-
-#### Modifying UI Behavior
-- Edit the `@UI.` annotations in the CDS view
-- Change `@UI.headerInfo` for header/title behavior
-- Modify `@UI.lineItem.position` values to reorder columns
-- Adjust `@UI.fieldGroup` for detail views (if present)
-
-#### Extending the CDS View
-- Use another CDS view that extends this one (via `extend view`)
-- abapgit will serialize the extension as a separate object
-
-### Commit Message Convention
-
-When syncing from SAP through abapgit, commits follow the pattern:
-- `[OBJECT_TYPE] Object Name` (e.g., `CDS View ZCDS_UX403_SADL_00`)
-- abapgit auto-generates these; avoid manual edits unless necessary
-
-## Useful Resources
-
-- **SAP ABAP CDS Documentation**: Core Data Services syntax and annotations
-- **Fiori Elements Documentation**: UI generation and annotation reference
-- **abapgit Project**: https://github.com/abapGit/abapGit — for sync mechanics
-- **SAP Fiori Design Guidelines**: https://experience.sap.com/fiori-design/ — for UI best practices
+- Commit messages: short, free text, ideally prefixed with the exercise (e.g. `Ex08: add customer value help`).
+- Only abapGit-generated files belong in `src/`. Flag anything else (e.g. `*.code-workspace`) and suggest moving it out or adding it to `.gitignore`.
+- Don't put system IDs, clients, user names or hostnames in README files or commit messages.
