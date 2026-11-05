@@ -221,7 +221,7 @@ The association is exposed by the CDS so that the generated OData metadata can r
 
 `@Consumption.valueHelp` remains in the CDS Data Definition.
 
-It is intentionally not maintained in the Metadata Extension because this SAP system does not permit `Consumption.valueHelp` in metadata extensions.
+It is intentionally not maintained in the Metadata Extension because the SAP system used for this exercise (IDES) does not permit `Consumption.valueHelp` in metadata extensions. Keeping it in the CDS view also makes the solution portable between the connected systems.
 
 UI-specific annotations such as:
 
@@ -330,9 +330,11 @@ No new Fiori Elements project was created.
 
 Backend implementation is complete.
 
-Fiori Elements validation is intentionally deferred to the company sandbox environment, where the required connectivity infrastructure already exists.
+For this exercise, the backend was developed and OData-verified in **IDES** and pushed to this branch with abapGit. This was a choice for this exercise, not a fixed role: backend development is possible in either connected system (see the `README.md` on `main`).
 
-The target environment provides:
+Fiori Elements validation is done in the **company sandbox**, because the connection to SAP Business Application Studio is already set up there. The Ex08 backend therefore has to be pulled into the sandbox with abapGit first, which also exercises the abapGit round trip between both systems.
+
+The sandbox setup for UI validation:
 
 ```text
 Company SAP Sandbox
@@ -352,10 +354,6 @@ SAP Business Application Studio
         v
 existing Fiori Elements application
 ```
-
-The IDES system was used for backend implementation and OData verification.
-
-The company sandbox will be used for integrated Fiori Elements validation.
 
 ---
 
