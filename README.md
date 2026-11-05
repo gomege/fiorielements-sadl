@@ -154,7 +154,7 @@ Tax Amount
 
 ### Currency Semantics
 
-TaxAmount should be linked to CurrencyCode using semantic annotations.
+TaxAmount is linked to CurrencyCode using semantic annotations.
 
 Expected result:
 
@@ -170,7 +170,7 @@ instead of
 
 ### Hidden Currency Field
 
-CurrencyCode remains available for formatting purposes but should not be selectable as an independent table column.
+CurrencyCode remains available for formatting purposes but is not selectable as an independent table column.
 
 ### Responsive Importance
 
@@ -195,13 +195,12 @@ Completed:
 - Metadata Extension remains active
 - Existing OData service reused
 - Existing Fiori Elements application reused
+- TaxAmount data element `ZUX403_TAX_AMOUNT` created (medium label "Tax Amount")
+- currency semantics: `@Semantics.amount.currencyCode: 'CurrencyCode'` on TaxAmount
+- hidden currency field: `@UI.hidden: true` on CurrencyCode
+- responsive importance: `importance: #LOW` on TaxAmount
 
-Pending:
-
-- TaxAmount data element
-- currency semantics
-- hidden currency field
-- responsive importance
+Exercise 07 is completed.
 
 ---
 
@@ -215,8 +214,8 @@ main
          +-- ux403-ex07-basic-list-report
                 |
                 +-- ux403-ex08-search-filter
-                |
-                +-- ux403-ex09-object-page
+                       |
+                       +-- ux403-ex09-object-page
 ```
 
 The branch history is intentionally cumulative.
