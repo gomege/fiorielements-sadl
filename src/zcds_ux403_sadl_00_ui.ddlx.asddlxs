@@ -10,13 +10,17 @@ annotate view ZCDS_UX403_SADL_00 with
   @UI.lineItem: [ { position: 10, importance: #HIGH, label: 'Sales Order ID' } ]
   SalesOrderID;
 
-
   @UI.lineItem: [ { position: 20, importance: #HIGH, label: 'BP ID' } ]
+  @UI.selectionField: [ { position: 10 } ]
   CustomerID;
 
 
   @UI.lineItem: [ { position: 30, importance: #HIGH, label: 'Company Name' } ]
   CustomerName;
+
+
+  @UI.selectionField: [ { position: 20 } ]
+  CreationDate;
 
 
   @UI.lineItem: [ { position: 40, importance: #HIGH, label: 'Gross Amount' } ]
@@ -25,6 +29,10 @@ annotate view ZCDS_UX403_SADL_00 with
 
   @UI.lineItem: [ { position: 50, importance: #HIGH, label: 'Net Amount' } ]
   NetAmount;
+
+
+  @UI.hidden: true
+  CurrencyCode;
 
 
   @UI.lineItem: [ { position: 60, importance: #LOW, label: 'Tax Amount' } ]
