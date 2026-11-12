@@ -11,7 +11,7 @@
 define view ZCDS_UX403_SADL_00
   as select from SEPM_I_SalesOrder
 
-  association [1..1] to C_UX403CustomerVH as _CustomerVH on $projection.CustomerID = _CustomerVH.CustomerID
+  association [1..1] to ZC_UX403CustomerVH as _CustomerVH on $projection.CustomerID = _CustomerVH.CustomerID
 
 {
       @Search.defaultSearchElement: true
