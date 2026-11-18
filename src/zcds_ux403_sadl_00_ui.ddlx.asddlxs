@@ -7,34 +7,38 @@
 annotate view ZCDS_UX403_SADL_00 with
 
 {
-  @UI.lineItem: [ { position: 10, importance: #HIGH, label: 'Sales Order ID' } ]
+  @UI.lineItem:       [ { position: 10, importance: #HIGH, label: 'Sales Order ID' } ]
+  @UI.identification: [ { position: 10, label: 'Sales Order ID' } ]
   SalesOrderID;
 
-  @UI.lineItem: [ { position: 20, importance: #HIGH, label: 'BP ID' } ]
+  @UI.lineItem:       [ { position: 20, importance: #HIGH, label: 'BP ID' } ]
   @UI.selectionField: [ { position: 10 } ]
+  @UI.identification: [ { position: 20, label: 'BP ID' } ]
   CustomerID;
 
-
-  @UI.lineItem: [ { position: 30, importance: #HIGH, label: 'Company Name' } ]
+  @UI.lineItem:       [ { position: 30, importance: #HIGH, label: 'Company Name' } ]
+  @UI.identification: [ { position: 30, label: 'Company Name' } ]
   CustomerName;
 
-
-  @UI.selectionField: [ { position: 20 } ]
-  CreationDate;
-
-
-  @UI.lineItem: [ { position: 40, importance: #HIGH, label: 'Gross Amount' } ]
+  @UI.lineItem:       [ { position: 40, importance: #HIGH, label: 'Gross Amount' } ]
+  @UI.identification: [ { position: 40, label: 'Gross Amount' } ]
   GrossAmount;
 
-
-  @UI.lineItem: [ { position: 50, importance: #HIGH, label: 'Net Amount' } ]
+  @UI.lineItem:       [ { position: 50, importance: #HIGH, label: 'Net Amount' } ]
+  @UI.identification: [ { position: 50, label: 'Net Amount' } ]
   NetAmount;
+
+  @UI.identification: [ { position: 60, label: 'Overall Status' } ]
+  OverallStatus;
+
+  @UI.identification: [ { position: 70, label: 'Payment Method' } ]
+  Paymentmethod;
 
 
   @UI.hidden: true
   CurrencyCode;
 
 
-  @UI.lineItem: [ { position: 60, importance: #LOW, label: 'Tax Amount' } ]
+  @UI.lineItem: [ { position: 80, importance: #LOW, label: 'Tax Amount' } ]
   TaxAmount;
 }
