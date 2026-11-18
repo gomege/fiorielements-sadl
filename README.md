@@ -288,15 +288,15 @@ Fiori Elements application
 
 ## Exercise 11 Status
 
-Planned:
+**Exercise 11 completed.**
 
-- [ ] branch switched and pulled in the development system
-- [ ] collection facet `COLLFAC2` *Additional Information* added
-- [ ] field-group reference facets AMOUNT and STATUS added under `COLLFAC2`
-- [ ] Metadata Extension activated
-- [ ] backend pushed to GitHub with abapGit
-- [ ] sections validated in the Fiori Elements application
-- [ ] Exercises 07 to 10 regression-tested
+- ✅ branch switched and pulled in the development system
+- ✅ collection facet `COLLFAC2` *Additional Information* added
+- ✅ field-group reference facets AMOUNT and STATUS added under `COLLFAC2`
+- ✅ Metadata Extension activated
+- ✅ backend pushed to GitHub with abapGit
+- ✅ sections validated in the Fiori Elements application
+- ✅ Exercises 07 to 10 regression-tested
 
 ---
 
