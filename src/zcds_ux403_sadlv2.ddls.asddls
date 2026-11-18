@@ -50,7 +50,7 @@ define view ZCDS_UX403_SADL_00
       )                              as TaxAmount,
       SalesOrderOverallStatus       as OverallStatus,
       
-      SalesOrderPaymentMethod       as Paymentmethod,
+      SalesOrderPaymentMethod       as PaymentMethod,
 
       _CustomerVH
 }

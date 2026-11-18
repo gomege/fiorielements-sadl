@@ -7,6 +7,14 @@
 annotate view ZCDS_UX403_SADL_00 with
 
 {
+  @UI.facet: [ { id:       'COLLFAC1',
+                 type:     #COLLECTION,
+                 label:    'General Information',
+                 position: 10 },
+               { type:     #IDENTIFICATION_REFERENCE,
+                 label:    'General Information',
+                 parentId: 'COLLFAC1',
+                 position: 10 } ]
   @UI.lineItem:       [ { position: 10, importance: #HIGH, label: 'Sales Order ID' } ]
   @UI.identification: [ { position: 10, label: 'Sales Order ID' } ]
   SalesOrderID;
@@ -20,6 +28,9 @@ annotate view ZCDS_UX403_SADL_00 with
   @UI.identification: [ { position: 30, label: 'Company Name' } ]
   CustomerName;
 
+  @UI.selectionField: [ { position: 20 } ]    // keep: Ex08 filter field
+  CreationDate;
+
   @UI.lineItem:       [ { position: 40, importance: #HIGH, label: 'Gross Amount' } ]
   @UI.identification: [ { position: 40, label: 'Gross Amount' } ]
   GrossAmount;
@@ -32,13 +43,11 @@ annotate view ZCDS_UX403_SADL_00 with
   OverallStatus;
 
   @UI.identification: [ { position: 70, label: 'Payment Method' } ]
-  Paymentmethod;
-
+  PaymentMethod;
 
   @UI.hidden: true
   CurrencyCode;
 
-
-  @UI.lineItem: [ { position: 80, importance: #LOW, label: 'Tax Amount' } ]
+  @UI.lineItem:       [ { position: 80, importance: #LOW, label: 'Tax Amount' } ]
   TaxAmount;
 }
