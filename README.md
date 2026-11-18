@@ -202,6 +202,9 @@ In `ZCDS_UX403_SADL_00_UI`, add `@UI.identification` to each field. Keep the exi
   @UI.identification: [ { position: 30, label: 'Company Name' } ]
   CustomerName;
 
+  @UI.selectionField: [ { position: 20 } ]    // keep: Ex08 filter field
+  CreationDate;
+
   @UI.lineItem:       [ { position: 40, importance: #HIGH, label: 'Gross Amount' } ]
   @UI.identification: [ { position: 40, label: 'Gross Amount' } ]
   GrossAmount;
@@ -215,7 +218,15 @@ In `ZCDS_UX403_SADL_00_UI`, add `@UI.identification` to each field. Keep the exi
 
   @UI.identification: [ { position: 70, label: 'Payment Method' } ]
   PaymentMethod;
+
+  @UI.hidden: true
+  CurrencyCode;
+
+  @UI.lineItem:       [ { position: 80, importance: #LOW, label: 'Tax Amount' } ]
+  TaxAmount;
 ```
+
+> `@UI.lineItem` and `@UI.identification` positions are independent of each other. `TaxAmount` was moved from line-item position 60 to 80; it remains the last List Report column, so the List Report looks the same.
 
 ---
 
