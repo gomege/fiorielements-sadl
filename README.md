@@ -119,6 +119,20 @@ The Object Page shows these fields through `@UI.identification`:
 | 60 | OverallStatus | **new field** |
 | 70 | PaymentMethod | **new field** |
 
+### Known Data Limitation: PaymentMethod is empty
+
+`PaymentMethod` is displayed on the Object Page but shows **no value for any sales order**.
+
+This is a property of the EPM demo data in the system, not an implementation error. A check in the ADT SQL Console confirmed that `SalesOrderPaymentMethod` is empty for all sales orders:
+
+```sql
+SELECT SalesOrderPaymentMethod, COUNT(*) AS cnt
+  FROM SEPM_I_SalesOrder
+ GROUP BY SalesOrderPaymentMethod
+```
+
+The field is kept because the exercise requires it and the annotation is correct.
+
 ---
 
 ## Facets
@@ -178,7 +192,7 @@ In `ZCDS_UX403_SADL_00`, add the two fields to the projection list, for example 
       SalesOrderPaymentMethod        as PaymentMethod,
 ```
 
-> **Verify the source field names first.** The names `SalesOrderOverallStatus` and `SalesOrderPaymentMethod` are expected names in `SEPM_I_SalesOrder`, but they have not been checked in the system yet. Open `SEPM_I_SalesOrder` in ADT (F3) or use code completion (Ctrl+Space) and adjust the names if needed.
+> The source field names `SalesOrderOverallStatus` and `SalesOrderPaymentMethod` were verified in `SEPM_I_SalesOrder` in ADT.
 
 Activate the CDS view.
 
@@ -277,6 +291,8 @@ In abapGit:
 2. Commit, for example: `Ex09: add object page facets and identification`.
 3. Push to `ux403-ex09-object-page`.
 
+> Commits made directly on GitHub that only change files outside `src/` (for example this README) do not require a pull in abapGit before the next push.
+
 ---
 
 ## 7. Validate in the Fiori Elements application
@@ -339,27 +355,41 @@ Fiori Elements application
 
 ## Exercise 09 Status
 
-Planned:
+**Exercise 09 completed.**
 
-- [ ] branch switched and pulled in the development system
-- [ ] source field names verified in `SEPM_I_SalesOrder`
-- [ ] `OverallStatus` and `PaymentMethod` added to the CDS view
-- [ ] `@UI.identification` added (positions 10–70)
-- [ ] `@UI.facet` added (collection + identification reference)
-- [ ] CDS view and Metadata Extension activated
-- [ ] `$metadata` verified
-- [ ] backend pushed to GitHub with abapGit
-- [ ] Object Page validated in the Fiori Elements application
-- [ ] Exercises 07 and 08 regression-tested
+- ✅ branch switched and pulled in the development system
+- ✅ source field names verified in `SEPM_I_SalesOrder`
+- ✅ `OverallStatus` and `PaymentMethod` added to the CDS view
+- ✅ `@UI.identification` added (positions 10–70)
+- ✅ `@UI.facet` added (collection + identification reference)
+- ✅ CDS view and Metadata Extension activated
+- ✅ backend pushed to GitHub with abapGit
+- ✅ Object Page validated in the Fiori Elements application
+- ✅ Exercises 07 and 08 regression-tested (including the restored `CreationDate` filter)
+
+Open points:
+
+- `PaymentMethod` has no data in the demo system (see *Known Data Limitation*).
 
 ---
 
 ## Next Exercise
 
-After successful validation, create the next branch from:
+```text
+Exercise 10
+Add Header Facets
+```
+
+Create the next branch from:
 
 ```text
 ux403-ex09-object-page
+```
+
+Expected branch:
+
+```text
+ux403-ex10-header-facets
 ```
 
 ---
