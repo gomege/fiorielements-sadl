@@ -1,10 +1,10 @@
-# UX403 Exercise 12: Navigate to an External URL
+# UX403 Exercise 13: Visualize the List Report
 
 ## Objective
 
-This branch implements UX403 Exercise 12: an **external link** on the customer name in the List Report.
+This branch implements UX403 Exercise 13: **criticality** (semantic colouring) in the List Report.
 
-The *Company Name* column becomes a link. Selecting it opens a Google search for the company name in the browser.
+A value in the List Report is displayed in a colour (green, orange or red) that depends on a calculated criticality value. In this repository, the **Gross Amount** column is coloured by order size.
 
 As in the previous exercises, the existing CDS view, Metadata Extension, OData service and Fiori Elements application are reused and enhanced. No new objects are created.
 
@@ -13,13 +13,13 @@ As in the previous exercises, the existing CDS view, Metadata Extension, OData s
 ## Branch
 
 ```text
-ux403-ex12-external-url
+ux403-ex13-list-criticality
 ```
 
 Parent branch:
 
 ```text
-ux403-ex11-body-facets
+ux403-ex12-external-url
 ```
 
 The branch history is intentionally cumulative.
@@ -28,16 +28,17 @@ The branch history is intentionally cumulative.
 
 ## Training Deviation
 
-The official exercise again creates a new set of objects from a template:
+The official exercise again creates a new set of objects from a template, and it uses a **different data model** (product stock with quantities instead of sales orders):
 
 | Official exercise | This repository |
 |---|---|
-| New CDS view `ZCDS_UX403_LINK_##` from a template file | Existing CDS view `ZCDS_UX403_SADL_00` |
+| New CDS view `ZCDS_UX403_VIS_##` from a template file (product stock) | Existing CDS view `ZCDS_UX403_SADL_00` (sales orders) |
+| Field `StockLevel` coloured by `StockLevelCritical` | Field `GrossAmount` coloured by `GrossAmountCriticality` |
+| Thresholds: `LotSizeQuantity` and `MinimumStockQuantity` (fields of the stock data) | Thresholds: two fixed amounts, chosen from the sales order data |
 | UI annotations directly in the CDS view | UI annotations in the existing Metadata Extension `ZCDS_UX403_SADL_00_UI` |
-| New OData service `ZCDS_UX403_LINK_##_CDS`, registered in `/IWFND/MAINT_SERVICE` | Existing service `ZCDS_UX403_SADL_00_CDS` (already registered) |
-| New Fiori Elements project (template *List Report Object Page*) | Existing Fiori Elements application in SAP Business Application Studio |
+| New OData service `ZCDS_UX403_VIS_##_CDS` and new Fiori Elements project | Existing service `ZCDS_UX403_SADL_00_CDS` and existing Fiori Elements application |
 
-Therefore the official **Task 1, Task 2 and Task 3 are skipped**. Tasks 4 and 5 are implemented on the existing objects.
+Therefore the official **Task 1, Task 2 and Task 3 are skipped**. Tasks 4 and 5 are implemented on the existing objects with the **same technique** (`case` expression → hidden criticality field → `criticality` in `@UI.lineItem`), applied to sales order amounts.
 
 ```text
 One CDS view · One Metadata Extension · One OData service · One Fiori Elements app
@@ -53,55 +54,66 @@ ZCODE_GIT_FIORIELEMENTS-SADL
 
 ---
 
-## Objects Changed in Exercise 12
+## Objects Changed in Exercise 13
 
 | Object | Type | Change |
 |---|---|---|
-| `ZCDS_UX403_SADL_00` | CDS Data Definition | add calculated field `SearchURL` |
-| `ZCDS_UX403_SADL_00_UI` | Metadata Extension | `CustomerName` line item becomes `#WITH_URL`; `SearchURL` hidden |
+| `ZCDS_UX403_SADL_00` | CDS Data Definition | add calculated field `GrossAmountCriticality` |
+| `ZCDS_UX403_SADL_00_UI` | Metadata Extension | `criticality` on the `GrossAmount` line item; `GrossAmountCriticality` hidden |
 | `ZCDS_UX403_SADL_00_CDS` | Generated OData service | no manual change; metadata is regenerated on activation |
 
 ---
 
-## Exercise 11 Baseline
+## Exercise 12 Baseline
 
-Exercise 12 builds on the completed Exercise 11 implementation:
+Exercise 13 builds on the completed Exercise 12 implementation:
 
-- List Report with line items, search, filter fields and Customer value help
+- List Report with line items, search, filter fields, Customer value help
+- *Company Name* as link to a Google search (`SearchURL`, hidden)
 - Object Page header with title and header facets **Amounts** and **Status**
 - Object Page sections **General Information** and **Additional Information**
 
 ---
 
-# Exercise 12 Features
+# Exercise 13 Features
 
-## Calculated Field SearchURL
+## Criticality Values
 
-A new field builds the Google search URL from a fixed part and the company name, using the CDS function `concat`:
+Fiori Elements interprets a criticality value as a colour:
+
+| Value | Meaning | Colour |
+|---|---|---|
+| 0 | neutral | default text colour |
+| 1 | negative | red |
+| 2 | critical | orange |
+| 3 | positive | green |
+
+## Calculated Field GrossAmountCriticality
+
+A `case` expression in the CDS view calculates the criticality from the gross amount, with the same structure as the course:
 
 ```text
-'https://www.google.com/search?q='  +  CompanyName   =   SearchURL
+GrossAmount  >  upper threshold                      →  3  (green)
+GrossAmount  >  lower threshold                      →  2  (orange)
+otherwise                                            →  1  (red)
 ```
 
-Example: `https://www.google.com/search?q=SAP`
+Business reading for this exercise: large orders are positive, small orders are negative.
 
-## Link on Company Name
+## Criticality on the Line Item
 
-| Annotation (on `CustomerName`, in `@UI.lineItem`) | Meaning |
-|---|---|
-| `type: #WITH_URL` | the column is rendered as a link instead of plain text |
-| `url: 'SearchURL'` | the link target is taken from the field `SearchURL` |
+`criticality: 'GrossAmountCriticality'` in the `@UI.lineItem` of `GrossAmount` tells Fiori Elements which field contains the colour value for this column.
 
-## Hidden SearchURL
+## Hidden Criticality Field
 
-`SearchURL` is only a technical field for the link target. `@UI.hidden: true` keeps it out of the UI (table columns, Object Page, column settings). It is still part of the OData entity, so the link can use it.
+`GrossAmountCriticality` is a technical field. `@UI.hidden: true` keeps it out of the UI. It is still part of the OData entity, so the column can use it.
 
 ```text
 List Report row
-  Company Name: "SAP"  (link)  ──select──►  https://www.google.com/search?q=SAP
-                                              ▲
-                                              │ url: 'SearchURL'
-                                     SearchURL (hidden)
+  Gross Amount: 12,500.00 EUR   (green)
+                    ▲
+                    │ criticality: 'GrossAmountCriticality'
+      GrossAmountCriticality = 3  (hidden)
 ```
 
 ---
@@ -110,9 +122,9 @@ List Report row
 
 | Annotation / element | Location | Reason |
 |---|---|---|
-| `SearchURL` (calculated field) | CDS Data Definition | data model |
-| `@UI.lineItem` with `type: #WITH_URL`, `url` | Metadata Extension | UI presentation |
-| `@UI.hidden` on `SearchURL` | Metadata Extension | UI presentation (same as `CurrencyCode`) |
+| `GrossAmountCriticality` (calculated field) | CDS Data Definition | data model |
+| `criticality` in `@UI.lineItem` of `GrossAmount` | Metadata Extension | UI presentation |
+| `@UI.hidden` on `GrossAmountCriticality` | Metadata Extension | UI presentation (same as `CurrencyCode`, `SearchURL`) |
 
 ---
 
@@ -120,64 +132,93 @@ List Report row
 
 Develop in **ADT (Eclipse)** in the SAP system. Do not edit files in `src/` by hand (see `README.md` on `main`).
 
+Remember the lesson from Ex12: **data model first** (CDS view, activate, Data Preview), **then UI** (Metadata Extension).
+
 ## 1. Prepare the system
 
-1. In abapGit, switch the repository to branch `ux403-ex12-external-url`.
-2. Pull, so that the system has the current Exercise 11 state.
+1. In abapGit, switch the repository to branch `ux403-ex13-list-criticality`.
+2. Pull, so that the system has the current Exercise 12 state.
 3. Check that no local changes are pending (no diff icon in abapGit).
 
 ---
 
-## 2. Add the field SearchURL to the CDS view
+## 2. Choose the thresholds from the data
 
-In `ZCDS_UX403_SADL_00`, add the new field directly after `CustomerName`:
+The course thresholds come from fields of the stock data. Sales orders have no such fields, so two fixed amounts are used. Choose them so that all three colours appear.
 
-```abap
-      @Search.defaultSearchElement: true
-      _Customer.CompanyName          as CustomerName,
+Run in the ADT SQL Console:
 
-      concat( 'https://www.google.com/search?q=',
-              _Customer.CompanyName ) as SearchURL,
-
-      _Customer.URL                  as CustomerURL,
+```sql
+SELECT TransactionCurrency,
+       COUNT(*)                          AS cnt,
+       MIN( GrossAmountInTransacCurrency ) AS min_amount,
+       MAX( GrossAmountInTransacCurrency ) AS max_amount
+  FROM SEPM_I_SalesOrder
+ GROUP BY TransactionCurrency
 ```
 
-Check (Ctrl+F2), activate (Ctrl+F3) and use the Data Preview (F8) to see the generated URLs.
+Pick a **lower** and an **upper** threshold that split the orders of the main currency into roughly three groups.
+
+> The examples below use **1000** and **10000** as placeholders. Replace them with your values.
+
+Note: the comparison ignores the currency. With several currencies this is a simplification that is acceptable for the exercise.
 
 ---
 
-## 3. Update the Metadata Extension
+## 3. Add the criticality field to the CDS view
+
+In `ZCDS_UX403_SADL_00`, add the new field directly after `GrossAmount`:
+
+```abap
+      GrossAmountInTransacCurrency   as GrossAmount,
+
+      case
+        when GrossAmountInTransacCurrency > 10000 then 3
+        when GrossAmountInTransacCurrency > 1000  then 2
+        else 1
+      end                            as GrossAmountCriticality,
+
+      NetAmountInTransactionCurrency as NetAmount,
+```
+
+> **Not yet verified in the system:** comparing the amount field directly with a number literal. If activation reports a type error, compare a converted value instead, for example `cast( GrossAmountInTransacCurrency as abap.dec(15,2) ) > 10000`.
+
+Check (Ctrl+F2), activate (Ctrl+F3) and use the Data Preview (F8): `GrossAmountCriticality` must contain 1, 2 and 3. If one value is missing, adjust the thresholds.
+
+---
+
+## 4. Update the Metadata Extension
 
 Two changes in `ZCDS_UX403_SADL_00_UI`. All other annotations stay as they are.
 
-### 3a. Make CustomerName a link
+### 4a. Add criticality to the GrossAmount line item
 
-Replace the `@UI.lineItem` of `CustomerName` (keep `@UI.identification`):
+Replace the complete `GrossAmount` block (keep `@UI.identification` and `@UI.fieldGroup`):
 
 ```abap
-  @UI.lineItem:       [ { position:   30,
-                          importance: #HIGH,
-                          label:      'Company Name',
-                          type:       #WITH_URL,
-                          url:        'SearchURL' } ]
-  @UI.identification: [ { position: 30, label: 'Company Name' } ]
-  CustomerName;
+  @UI.lineItem:       [ { position:    40,
+                          importance:  #HIGH,
+                          label:       'Gross Amount',
+                          criticality: 'GrossAmountCriticality' } ]
+  @UI.identification: [ { position: 40, label: 'Gross Amount' } ]
+  @UI.fieldGroup:     [ { qualifier: 'AMOUNT', position: 10, label: 'Gross Amount' } ]
+  GrossAmount;
 ```
 
-### 3b. Hide SearchURL
+### 4b. Hide GrossAmountCriticality
 
-Add directly after `CustomerName`:
+Add directly after the `GrossAmount` block:
 
 ```abap
   @UI.hidden: true
-  SearchURL;
+  GrossAmountCriticality;
 ```
 
 Activate the Metadata Extension.
 
 ---
 
-## 4. Verify the OData service
+## 5. Verify the OData service
 
 Service:
 
@@ -187,58 +228,71 @@ ZCDS_UX403_SADL_00_CDS
 
 Check `$metadata` and the entity set:
 
-- the entity type contains `SearchURL`, and the entity set returns URLs such as `https://www.google.com/search?q=...`
-- in the annotation model `ZCDS_UX403_SADL_00_CDS_VAN`, the `UI.LineItem` entry for `CustomerName` is a `UI.DataFieldWithUrl` with `Url` = path `SearchURL`
-- `SearchURL` carries `UI.Hidden`
+- the entity type contains `GrossAmountCriticality`; the entity set returns the values 1, 2 and 3
+- in the annotation model `ZCDS_UX403_SADL_00_CDS_VAN`, the `UI.LineItem` entry for `GrossAmount` contains `Criticality` with path `GrossAmountCriticality`
+- `GrossAmountCriticality` carries `UI.Hidden`
 
 If the old metadata is still returned, clear the metadata cache (`/IWFND/CACHE_CLEANUP`, `/IWBEP/CACHE_CLEANUP`) and reload.
 
 ---
 
-## 5. Push the backend to GitHub
+## 6. Push the backend to GitHub
 
 In abapGit:
 
 1. Stage the changed objects (CDS view, Metadata Extension and any changed service files).
-2. Commit, for example: `Ex12: add external search link on company name`.
-3. Push to `ux403-ex12-external-url`.
+2. Commit, for example: `Ex13: add criticality to gross amount`.
+3. Push to `ux403-ex13-list-criticality`.
 
 > Commits made directly on GitHub that only change files outside `src/` (for example this README) do not require a pull in abapGit before the next push.
 
 ---
 
-## 6. Validate in the Fiori Elements application
+## 7. Validate in the Fiori Elements application
 
 Use the existing application in SAP Business Application Studio. Do not generate a new application.
 
 1. Start the application and choose **Go**.
-2. The *Company Name* column shows the names as links.
-3. Select a link: a Google search for that company opens.
-4. `SearchURL` does not appear as a column, in the column settings or on the Object Page.
+2. The *Gross Amount* column shows values in green, orange and red, matching the thresholds.
+3. Depending on the UI5 version, a status icon may also appear next to the value.
+4. `GrossAmountCriticality` does not appear as a column, in the column settings or on the Object Page.
 5. Refresh the browser (Ctrl+Shift+R) if nothing changes.
 
 ---
 
-## 7. Regression-test Exercises 07 to 11
+## 8. Regression-test Exercises 07 to 12
 
 Verify that:
 
 - all other List Report columns, search, filter fields and Customer value help are unchanged
-- free-text search on `CustomerName` still works (the field itself is unchanged; only its display changed)
+- the *Company Name* link to Google still works
 - the Object Page header facets and both sections are unchanged
 
 ---
 
-## Notes and Limitations
+## Bonus Exercise: Colour the Amount in the Object Page Header
 
-- **Link only in the List Report.** As in the course, only `@UI.lineItem` gets `#WITH_URL`. On the Object Page, *Company Name* stays plain text. The same `type`/`url` properties could also be added to `@UI.identification` if a link is wanted there.
-- **Special characters.** The company name is inserted into the URL unencoded. Names with characters such as `&` or `#` may produce an incomplete search. Spaces are handled by the browser. For a training exercise this is acceptable.
-- **Alternative target.** The view already contains `CustomerURL` (the customer's web site). `url: 'CustomerURL'` would link to the customer's own site instead of a search.
-- **Customer data in an external URL.** The company name is sent to an external search engine. This is fine for EPM demo data; in real applications, check data protection before sending business data to external services.
+*Small extra task, not part of the official course.*
+
+### Task
+
+After Ex13 the gross amount is coloured in the List Report, but not on the Object Page. Make **Gross Amount in the header facet *Amounts*** show the same colour as in the List Report.
+
+### Hints
+
+- Which annotation feeds the header facet *Amounts*? (See Ex10.)
+- The property you used in `@UI.lineItem` in this exercise also exists in that annotation.
+- No CDS view change is needed: the criticality value already exists.
+- Is the colour also shown in the section *Additional Information*? Why?
+
+### Expected Result
+
+- In the Object Page header, *Gross Amount* is shown in the same colour as in the List Report row.
+- The List Report is unchanged.
 
 ---
 
-## Architecture After Exercise 12
+## Architecture After Exercise 13
 
 ```text
 ZCDS_UX403_SADL_00
@@ -247,74 +301,47 @@ ZCDS_UX403_SADL_00
         |-- value-help association
         |-- amount/currency semantics
         |-- business and status fields
-        |-- SearchURL (concat)                    <- new
+        |-- SearchURL (concat)
+        |-- GrossAmountCriticality (case)            <- new
         |
         +---- ZCDS_UX403_SADL_00_UI
         |       |
         |       |-- header info
         |       |-- line items
-        |       |     +-- CustomerName #WITH_URL  <- new
+        |       |     |-- CustomerName #WITH_URL
+        |       |     +-- GrossAmount criticality     <- new
         |       |-- selection fields
         |       |-- identification / field groups
         |       |-- facets (header + 2 sections)
-        |       +-- hidden: CurrencyCode, SearchURL   <- new
+        |       +-- hidden: CurrencyCode, SearchURL, GrossAmountCriticality   <- new
         |
         v
 ZCDS_UX403_SADL_00_CDS
         |
         v
 Fiori Elements application
-  List Report (Company Name link → Google)  --select row-->  Object Page
+  List Report (coloured Gross Amount)  --select row-->  Object Page
 ```
 
 ---
 
-## Lessons Learned
+## Exercise 13 Status
 
-- **Data model first, UI second.** In the first attempt only the Metadata Extension was changed. `url: 'SearchURL'` then pointed to a field that did not exist in the CDS view, so the link did not work. The correct order is: add the field to the CDS view → activate → check in Data Preview → then annotate it in the Metadata Extension.
-- **Element names in the Metadata Extension** are not case-sensitive (`searchurl` works), but writing them exactly like the CDS alias (`SearchURL`) keeps the code readable and searchable.
+Planned:
 
----
-
-## Bonus Exercise: Link to the Customer's Web Site
-
-*Small extra task, not part of the official course.*
-
-### Task
-
-The view already exposes `CustomerURL` (the customer's web site), but it is not shown anywhere in the app. Show it on the Object Page in the section **General Information**, as a **clickable link that opens the customer's own web site**.
-
-### Hints
-
-- Which annotation puts a field into *General Information*? (See Ex09.)
-- In Ex12, `type` and `url` were used inside `@UI.lineItem`. The same two properties exist for that other annotation.
-- A field can be the link target of itself.
-- Before testing, look at a few `CustomerURL` values in the Data Preview (F8). Does every value start with `http://` or `https://`? What would the browser do with a value like `www.example.com`?
-
-### Expected Result
-
-- *General Information* shows a new field *Web Site* (or similar label) at the end of the field list.
-- Selecting it opens the customer's web site in a new browser tab.
-- No CDS view change is needed.
-
----
-
-## Exercise 12 Status
-
-**Exercise 12 completed.**
-
-- ✅ branch switched and pulled in the development system
-- ✅ `SearchURL` added to the CDS view
-- ✅ `CustomerName` line item changed to `#WITH_URL` with `url: 'SearchURL'`
-- ✅ `SearchURL` hidden
-- ✅ CDS view and Metadata Extension activated
-- ✅ backend pushed to GitHub with abapGit
-- ✅ link validated in the Fiori Elements application
-- ✅ Exercises 07 to 11 regression-tested
+- [ ] branch switched and pulled in the development system
+- [ ] thresholds chosen from the sales order data
+- [ ] `GrossAmountCriticality` added to the CDS view (values 1, 2, 3 in Data Preview)
+- [ ] `criticality` added to the `GrossAmount` line item
+- [ ] `GrossAmountCriticality` hidden
+- [ ] CDS view and Metadata Extension activated
+- [ ] backend pushed to GitHub with abapGit
+- [ ] colours validated in the Fiori Elements application
+- [ ] Exercises 07 to 12 regression-tested
 
 Bonus exercise:
 
-- [ ] `CustomerURL` shown as link in *General Information*
+- [ ] Gross Amount coloured in the Object Page header
 
 ---
 
@@ -336,6 +363,8 @@ main
                                      +-- ux403-ex11-body-facets
                                             |
                                             +-- ux403-ex12-external-url
+                                                   |
+                                                   +-- ux403-ex13-list-criticality
 ```
 
 Each exercise branch represents the cumulative application state at that stage of the UX403 training.
@@ -344,4 +373,4 @@ Each exercise branch represents the cumulative application state at that stage o
 
 ## Source
 
-Exercise content based on *UX403, Unit 5, Exercise 12: Navigate to an External URL*. The course material is not part of this repository.
+Exercise content based on *UX403, Unit 5, Exercise 13: Visualize the List Report*. The course material is not part of this repository.
