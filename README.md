@@ -174,7 +174,7 @@ In `ZCDS_UX403_SADL_00`, add the three fields after `OverallStatus`:
 }
 ```
 
-> **Verify the source field names first.** `SalesOrderBillingStatus`, `SalesOrderDeliveryStatus` and `SalesOrderLifeCycleStatus` are the expected names in `SEPM_I_SalesOrder` (same pattern as `SalesOrderOverallStatus`), but they have not been checked in the system yet. Use code completion (Ctrl+Space) and adjust if needed.
+> The source field names `SalesOrderBillingStatus`, `SalesOrderDeliveryStatus` and `SalesOrderLifeCycleStatus` were verified in `SEPM_I_SalesOrder` (activation successful).
 
 Check (Ctrl+F2), activate (Ctrl+F3) and use the Data Preview (F8) to see whether the status fields contain data.
 
@@ -366,17 +366,21 @@ Fiori Elements application
 
 ## Exercise 10 Status
 
-Planned:
+**Exercise 10 completed.**
 
-- [ ] branch switched and pulled in the development system
-- [ ] source field names verified in `SEPM_I_SalesOrder`
-- [ ] `BillingStatus`, `DeliveryStatus`, `LifeCycleStatus` added to the CDS view
-- [ ] `@UI.fieldGroup` AMOUNT and STATUS added
-- [ ] header facets added to `@UI.facet`
-- [ ] CDS view and Metadata Extension activated
-- [ ] backend pushed to GitHub with abapGit
-- [ ] header facets validated in the Fiori Elements application
-- [ ] Exercises 07 to 09 regression-tested
+- ✅ branch switched and pulled in the development system
+- ✅ source field names verified in `SEPM_I_SalesOrder`
+- ✅ `BillingStatus`, `DeliveryStatus`, `LifeCycleStatus` added to the CDS view
+- ✅ `@UI.fieldGroup` AMOUNT and STATUS added
+- ✅ header facets added to `@UI.facet`
+- ✅ CDS view and Metadata Extension activated
+- ✅ backend pushed to GitHub with abapGit
+- ✅ header facets validated in the Fiori Elements application (all status fields contain data)
+- ✅ Exercises 07 to 09 regression-tested
+
+Possible improvement (later exercise):
+
+- status fields show codes; descriptive texts could be added with `@ObjectModel.text.element` or a text association.
 
 ---
 
