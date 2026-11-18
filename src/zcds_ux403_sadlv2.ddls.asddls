@@ -24,6 +24,9 @@ define view ZCDS_UX403_SADL_00
       @Search.defaultSearchElement: true
       _Customer.CompanyName          as CustomerName,
 
+      concat( 'https://www.google.com/search?q=',
+              _Customer.CompanyName ) as SearchURL,
+
       _Customer.URL                  as CustomerURL,
 
       @Search.defaultSearchElement: true

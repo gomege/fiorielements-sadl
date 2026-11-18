@@ -51,9 +51,15 @@ annotate view ZCDS_UX403_SADL_00 with
   @UI.identification: [ { position: 20, label: 'BP ID' } ]
   CustomerID;
 
-  @UI.lineItem:       [ { position: 30, importance: #HIGH, label: 'Company Name' } ]
+  @UI.lineItem:       [ { position:   30,
+                          importance: #HIGH,
+                          label:      'Company Name',
+                          type:       #WITH_URL,
+                          url:        'SearchURL' } ]
   @UI.identification: [ { position: 30, label: 'Company Name' } ]
   CustomerName;
+  @UI.hidden: true
+  searchurl;
 
   @UI.selectionField: [ { position: 20 } ]    // keep: Ex08 filter field
   CreationDate;
