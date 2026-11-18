@@ -18,7 +18,7 @@ annotate view ZCDS_UX403_SADL_00 with
                  targetQualifier: 'STATUS',
                  label:           'Status',
                  position:        20 },
-               /* Ex09: content section */
+               /* Ex09: section General Information */
                { id:       'COLLFAC1',
                  type:     #COLLECTION,
                  label:    'General Information',
@@ -26,7 +26,22 @@ annotate view ZCDS_UX403_SADL_00 with
                { type:     #IDENTIFICATION_REFERENCE,
                  label:    'General Information',
                  parentId: 'COLLFAC1',
-                 position: 10 } ]
+                 position: 10 },
+               /* Ex11: section Additional Information */
+               { id:       'COLLFAC2',
+                 type:     #COLLECTION,
+                 label:    'Additional Information',
+                 position: 20 },
+               { type:            #FIELDGROUP_REFERENCE,
+                 targetQualifier: 'AMOUNT',
+                 label:           'Amounts',
+                 parentId:        'COLLFAC2',
+                 position:        10 },
+               { type:            #FIELDGROUP_REFERENCE,
+                 targetQualifier: 'STATUS',
+                 label:           'Status',
+                 parentId:        'COLLFAC2',
+                 position:        20 } ]
   @UI.lineItem:       [ { position: 10, importance: #HIGH, label: 'Sales Order ID' } ]
   @UI.identification: [ { position: 10, label: 'Sales Order ID' } ]
   SalesOrderID;
