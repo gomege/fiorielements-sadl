@@ -269,18 +269,52 @@ Fiori Elements application
 
 ---
 
+## Lessons Learned
+
+- **Data model first, UI second.** In the first attempt only the Metadata Extension was changed. `url: 'SearchURL'` then pointed to a field that did not exist in the CDS view, so the link did not work. The correct order is: add the field to the CDS view → activate → check in Data Preview → then annotate it in the Metadata Extension.
+- **Element names in the Metadata Extension** are not case-sensitive (`searchurl` works), but writing them exactly like the CDS alias (`SearchURL`) keeps the code readable and searchable.
+
+---
+
+## Bonus Exercise: Link to the Customer's Web Site
+
+*Small extra task, not part of the official course.*
+
+### Task
+
+The view already exposes `CustomerURL` (the customer's web site), but it is not shown anywhere in the app. Show it on the Object Page in the section **General Information**, as a **clickable link that opens the customer's own web site**.
+
+### Hints
+
+- Which annotation puts a field into *General Information*? (See Ex09.)
+- In Ex12, `type` and `url` were used inside `@UI.lineItem`. The same two properties exist for that other annotation.
+- A field can be the link target of itself.
+- Before testing, look at a few `CustomerURL` values in the Data Preview (F8). Does every value start with `http://` or `https://`? What would the browser do with a value like `www.example.com`?
+
+### Expected Result
+
+- *General Information* shows a new field *Web Site* (or similar label) at the end of the field list.
+- Selecting it opens the customer's web site in a new browser tab.
+- No CDS view change is needed.
+
+---
+
 ## Exercise 12 Status
 
-Planned:
+**Exercise 12 completed.**
 
-- [ ] branch switched and pulled in the development system
-- [ ] `SearchURL` added to the CDS view
-- [ ] `CustomerName` line item changed to `#WITH_URL` with `url: 'SearchURL'`
-- [ ] `SearchURL` hidden
-- [ ] CDS view and Metadata Extension activated
-- [ ] backend pushed to GitHub with abapGit
-- [ ] link validated in the Fiori Elements application
-- [ ] Exercises 07 to 11 regression-tested
+- ✅ branch switched and pulled in the development system
+- ✅ `SearchURL` added to the CDS view
+- ✅ `CustomerName` line item changed to `#WITH_URL` with `url: 'SearchURL'`
+- ✅ `SearchURL` hidden
+- ✅ CDS view and Metadata Extension activated
+- ✅ backend pushed to GitHub with abapGit
+- ✅ link validated in the Fiori Elements application
+- ✅ Exercises 07 to 11 regression-tested
+
+Bonus exercise:
+
+- [ ] `CustomerURL` shown as link in *General Information*
 
 ---
 
