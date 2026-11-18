@@ -1,13 +1,10 @@
-# UX403 Exercise 11: Add Sections and Facets to the Object Page
+# UX403 Exercise 12: Navigate to an External URL
 
 ## Objective
 
-This branch implements UX403 Exercise 11: **sections in the body area** of the Object Page of the existing Sales Order application.
+This branch implements UX403 Exercise 12: an **external link** on the customer name in the List Report.
 
-The body of the Object Page is organised in two sections:
-
-- **General Information**: the identification fields (exists since Ex09)
-- **Additional Information**: the field groups AMOUNT and STATUS (**new**)
+The *Company Name* column becomes a link. Selecting it opens a Google search for the company name in the browser.
 
 As in the previous exercises, the existing CDS view, Metadata Extension, OData service and Fiori Elements application are reused and enhanced. No new objects are created.
 
@@ -16,13 +13,13 @@ As in the previous exercises, the existing CDS view, Metadata Extension, OData s
 ## Branch
 
 ```text
-ux403-ex11-body-facets
+ux403-ex12-external-url
 ```
 
 Parent branch:
 
 ```text
-ux403-ex10-header-facets
+ux403-ex11-body-facets
 ```
 
 The branch history is intentionally cumulative.
@@ -35,14 +32,12 @@ The official exercise again creates a new set of objects from a template:
 
 | Official exercise | This repository |
 |---|---|
-| New CDS view `ZCDS_UX403_BDFT_##` from a template file (with identification and two field groups) | Existing CDS view `ZCDS_UX403_SADL_00` |
-| Annotations directly in the CDS view | UI annotations in the existing Metadata Extension `ZCDS_UX403_SADL_00_UI` |
-| New OData service `ZCDS_UX403_BDFT_##_CDS`, registered in `/IWFND/MAINT_SERVICE` | Existing service `ZCDS_UX403_SADL_00_CDS` (already registered) |
+| New CDS view `ZCDS_UX403_LINK_##` from a template file | Existing CDS view `ZCDS_UX403_SADL_00` |
+| UI annotations directly in the CDS view | UI annotations in the existing Metadata Extension `ZCDS_UX403_SADL_00_UI` |
+| New OData service `ZCDS_UX403_LINK_##_CDS`, registered in `/IWFND/MAINT_SERVICE` | Existing service `ZCDS_UX403_SADL_00_CDS` (already registered) |
 | New Fiori Elements project (template *List Report Object Page*) | Existing Fiori Elements application in SAP Business Application Studio |
 
-Therefore the official **Task 1, Task 2 and Task 3 are skipped**. Tasks 4, 5 and 6 are implemented on the existing objects.
-
-The official template has no header facets. In this repository the **header facets from Ex10 are kept**, so the AMOUNT and STATUS field groups appear both in the header and in the body (see *Design Note*).
+Therefore the official **Task 1, Task 2 and Task 3 are skipped**. Tasks 4 and 5 are implemented on the existing objects.
 
 ```text
 One CDS view · One Metadata Extension · One OData service · One Fiori Elements app
@@ -58,80 +53,66 @@ ZCODE_GIT_FIORIELEMENTS-SADL
 
 ---
 
-## Objects Changed in Exercise 11
+## Objects Changed in Exercise 12
 
 | Object | Type | Change |
 |---|---|---|
-| `ZCDS_UX403_SADL_00` | CDS Data Definition | **no change** |
-| `ZCDS_UX403_SADL_00_UI` | Metadata Extension | add collection facet `COLLFAC2` and two field-group reference facets to `@UI.facet` |
-| `ZCDS_UX403_SADL_00_CDS` | Generated OData service | no manual change; annotations are regenerated on activation |
+| `ZCDS_UX403_SADL_00` | CDS Data Definition | add calculated field `SearchURL` |
+| `ZCDS_UX403_SADL_00_UI` | Metadata Extension | `CustomerName` line item becomes `#WITH_URL`; `SearchURL` hidden |
+| `ZCDS_UX403_SADL_00_CDS` | Generated OData service | no manual change; metadata is regenerated on activation |
 
 ---
 
-## Exercise 10 Baseline
+## Exercise 11 Baseline
 
-Exercise 11 builds on the completed Exercise 10 implementation:
+Exercise 12 builds on the completed Exercise 11 implementation:
 
 - List Report with line items, search, filter fields and Customer value help
-- Object Page header: title from `@UI.headerInfo`, header facets **Amounts** and **Status**
-- Object Page body: section **General Information** (`COLLFAC1` + identification reference)
-- field groups `AMOUNT` (GrossAmount, NetAmount) and `STATUS` (Overall, Billing, Delivery, Life Cycle Status)
-
-### Comparison with the official tasks
-
-| Official task | Status |
-|---|---|
-| Task 4.1: collection facet *General Information*, `COLLFAC1`, position 10 | already in place since Ex09 |
-| Task 4.2: collection facet *Additional Information*, `COLLFAC2`, position 20 | **new** |
-| Task 5.1: identification reference under `COLLFAC1` | already in place since Ex09 |
-| Task 5.2: field-group references AMOUNT and STATUS under `COLLFAC2` | **new** |
-| Field groups AMOUNT and STATUS (part of the official template) | already in place since Ex10 |
+- Object Page header with title and header facets **Amounts** and **Status**
+- Object Page sections **General Information** and **Additional Information**
 
 ---
 
-# Exercise 11 Features
+# Exercise 12 Features
 
-## Collection Facets (sections)
+## Calculated Field SearchURL
 
-| Property | General Information | Additional Information |
-|---|---|---|
-| id | `COLLFAC1` | `COLLFAC2` |
-| type | `#COLLECTION` | `#COLLECTION` |
-| label | General Information | Additional Information |
-| position | 10 | 20 |
-| status | since Ex09 | **new** |
-
-## Reference Facets (sub-sections)
-
-| Parent | Type | Target | Label | Position |
-|---|---|---|---|---|
-| `COLLFAC1` | `#IDENTIFICATION_REFERENCE` | `@UI.identification` | General Information | 10 |
-| `COLLFAC2` | `#FIELDGROUP_REFERENCE` | field group `AMOUNT` | Amounts | 10 (**new**) |
-| `COLLFAC2` | `#FIELDGROUP_REFERENCE` | field group `STATUS` | Status | 20 (**new**) |
-
-The course does not specify labels or positions for the two field-group reference facets. `Amounts`/`Status` and 10/20 are chosen to match the header facets of Ex10.
+A new field builds the Google search URL from a fixed part and the company name, using the CDS function `concat`:
 
 ```text
-Object Page
-  ├─ Header
-  │    ├─ title: Sales Order <SalesOrderID>
-  │    ├─ Amounts   (header facet, Ex10)
-  │    └─ Status    (header facet, Ex10)
-  └─ Body
-       ├─ Section "General Information"     (COLLFAC1, Ex09)
-       │    └─ identification fields 10–70
-       └─ Section "Additional Information"  (COLLFAC2)                 <- new
-            ├─ Amounts  (#FIELDGROUP_REFERENCE → AMOUNT)               <- new
-            └─ Status   (#FIELDGROUP_REFERENCE → STATUS)               <- new
+'https://www.google.com/search?q='  +  CompanyName   =   SearchURL
+```
+
+Example: `https://www.google.com/search?q=SAP`
+
+## Link on Company Name
+
+| Annotation (on `CustomerName`, in `@UI.lineItem`) | Meaning |
+|---|---|
+| `type: #WITH_URL` | the column is rendered as a link instead of plain text |
+| `url: 'SearchURL'` | the link target is taken from the field `SearchURL` |
+
+## Hidden SearchURL
+
+`SearchURL` is only a technical field for the link target. `@UI.hidden: true` keeps it out of the UI (table columns, Object Page, column settings). It is still part of the OData entity, so the link can use it.
+
+```text
+List Report row
+  Company Name: "SAP"  (link)  ──select──►  https://www.google.com/search?q=SAP
+                                              ▲
+                                              │ url: 'SearchURL'
+                                     SearchURL (hidden)
 ```
 
 ---
 
-## Design Note: Field Groups in Header and Body
+## Annotation Placement
 
-The same field group can be referenced by several facets. After Ex11, AMOUNT and STATUS are shown twice: as header facets (Ex10) and in the *Additional Information* section (Ex11).
-
-This is kept on purpose, to show both exercises in one application. In a real application, one of them would usually be removed. That only requires deleting the corresponding entries from `@UI.facet`; the field groups themselves stay unchanged.
+| Annotation / element | Location | Reason |
+|---|---|---|
+| `SearchURL` (calculated field) | CDS Data Definition | data model |
+| `@UI.lineItem` with `type: #WITH_URL`, `url` | Metadata Extension | UI presentation |
+| `@UI.hidden` on `SearchURL` | Metadata Extension | UI presentation (same as `CurrencyCode`) |
 
 ---
 
@@ -141,68 +122,62 @@ Develop in **ADT (Eclipse)** in the SAP system. Do not edit files in `src/` by h
 
 ## 1. Prepare the system
 
-1. In abapGit, switch the repository to branch `ux403-ex11-body-facets`.
-2. Pull, so that the system has the current Exercise 10 state.
+1. In abapGit, switch the repository to branch `ux403-ex12-external-url`.
+2. Pull, so that the system has the current Exercise 11 state.
 3. Check that no local changes are pending (no diff icon in abapGit).
 
 ---
 
-## 2. Update the facets in the Metadata Extension
+## 2. Add the field SearchURL to the CDS view
 
-Only the `@UI.facet` annotation on `SalesOrderID` changes. The CDS view and all other annotations stay as they are.
-
-Replace the existing `@UI.facet` annotation with:
+In `ZCDS_UX403_SADL_00`, add the new field directly after `CustomerName`:
 
 ```abap
-  @UI.facet: [ /* Ex10: header facets */
-               { purpose:         #HEADER,
-                 type:            #FIELDGROUP_REFERENCE,
-                 targetQualifier: 'AMOUNT',
-                 label:           'Amounts',
-                 position:        10 },
-               { purpose:         #HEADER,
-                 type:            #FIELDGROUP_REFERENCE,
-                 targetQualifier: 'STATUS',
-                 label:           'Status',
-                 position:        20 },
-               /* Ex09: section General Information */
-               { id:       'COLLFAC1',
-                 type:     #COLLECTION,
-                 label:    'General Information',
-                 position: 10 },
-               { type:     #IDENTIFICATION_REFERENCE,
-                 label:    'General Information',
-                 parentId: 'COLLFAC1',
-                 position: 10 },
-               /* Ex11: section Additional Information */
-               { id:       'COLLFAC2',
-                 type:     #COLLECTION,
-                 label:    'Additional Information',
-                 position: 20 },
-               { type:            #FIELDGROUP_REFERENCE,
-                 targetQualifier: 'AMOUNT',
-                 label:           'Amounts',
-                 parentId:        'COLLFAC2',
-                 position:        10 },
-               { type:            #FIELDGROUP_REFERENCE,
-                 targetQualifier: 'STATUS',
-                 label:           'Status',
-                 parentId:        'COLLFAC2',
-                 position:        20 } ]
+      @Search.defaultSearchElement: true
+      _Customer.CompanyName          as CustomerName,
+
+      concat( 'https://www.google.com/search?q=',
+              _Customer.CompanyName ) as SearchURL,
+
+      _Customer.URL                  as CustomerURL,
 ```
 
-The annotations directly below it (`@UI.lineItem` and `@UI.identification` of `SalesOrderID`) remain unchanged.
+Check (Ctrl+F2), activate (Ctrl+F3) and use the Data Preview (F8) to see the generated URLs.
 
-Notes:
+---
 
-- `parentId` places a reference facet inside a collection facet; it must match the collection's `id` exactly.
-- Positions are ordered per level: header facets among themselves, sections among themselves, and sub-sections within their parent.
+## 3. Update the Metadata Extension
+
+Two changes in `ZCDS_UX403_SADL_00_UI`. All other annotations stay as they are.
+
+### 3a. Make CustomerName a link
+
+Replace the `@UI.lineItem` of `CustomerName` (keep `@UI.identification`):
+
+```abap
+  @UI.lineItem:       [ { position:   30,
+                          importance: #HIGH,
+                          label:      'Company Name',
+                          type:       #WITH_URL,
+                          url:        'SearchURL' } ]
+  @UI.identification: [ { position: 30, label: 'Company Name' } ]
+  CustomerName;
+```
+
+### 3b. Hide SearchURL
+
+Add directly after `CustomerName`:
+
+```abap
+  @UI.hidden: true
+  SearchURL;
+```
 
 Activate the Metadata Extension.
 
 ---
 
-## 3. Verify the OData service
+## 4. Verify the OData service
 
 Service:
 
@@ -210,93 +185,102 @@ Service:
 ZCDS_UX403_SADL_00_CDS
 ```
 
-Check the annotation model `ZCDS_UX403_SADL_00_CDS_VAN` in `$metadata`:
+Check `$metadata` and the entity set:
 
-- `UI.Facets` contains two `UI.CollectionFacet` entries (General Information, Additional Information)
-- the Additional Information collection contains two `UI.ReferenceFacet` entries pointing to `UI.FieldGroup#AMOUNT` and `UI.FieldGroup#STATUS`
-- `UI.HeaderFacets` is unchanged
+- the entity type contains `SearchURL`, and the entity set returns URLs such as `https://www.google.com/search?q=...`
+- in the annotation model `ZCDS_UX403_SADL_00_CDS_VAN`, the `UI.LineItem` entry for `CustomerName` is a `UI.DataFieldWithUrl` with `Url` = path `SearchURL`
+- `SearchURL` carries `UI.Hidden`
 
 If the old metadata is still returned, clear the metadata cache (`/IWFND/CACHE_CLEANUP`, `/IWBEP/CACHE_CLEANUP`) and reload.
 
 ---
 
-## 4. Push the backend to GitHub
+## 5. Push the backend to GitHub
 
 In abapGit:
 
-1. Stage the changed Metadata Extension (and any changed service files).
-2. Commit, for example: `Ex11: add Additional Information section`.
-3. Push to `ux403-ex11-body-facets`.
+1. Stage the changed objects (CDS view, Metadata Extension and any changed service files).
+2. Commit, for example: `Ex12: add external search link on company name`.
+3. Push to `ux403-ex12-external-url`.
 
 > Commits made directly on GitHub that only change files outside `src/` (for example this README) do not require a pull in abapGit before the next push.
 
 ---
 
-## 5. Validate in the Fiori Elements application
+## 6. Validate in the Fiori Elements application
 
 Use the existing application in SAP Business Application Studio. Do not generate a new application.
 
 1. Start the application and choose **Go**.
-2. Select a sales order row.
-3. Check the Object Page body:
-   - two sections (anchor bar tabs): **General Information** and **Additional Information**, in this order
-   - *General Information* shows the identification fields 10–70 as before
-   - *Additional Information* shows the sub-sections **Amounts** and **Status** with their fields
-4. Refresh the browser (Ctrl+Shift+R) if the body does not change.
+2. The *Company Name* column shows the names as links.
+3. Select a link: a Google search for that company opens.
+4. `SearchURL` does not appear as a column, in the column settings or on the Object Page.
+5. Refresh the browser (Ctrl+Shift+R) if nothing changes.
 
 ---
 
-## 6. Regression-test Exercises 07 to 10
+## 7. Regression-test Exercises 07 to 11
 
 Verify that:
 
-- the List Report, search, filter fields and Customer value help are unchanged
-- the Object Page header still shows the header facets **Amounts** and **Status**
-- the General Information section is unchanged
+- all other List Report columns, search, filter fields and Customer value help are unchanged
+- free-text search on `CustomerName` still works (the field itself is unchanged; only its display changed)
+- the Object Page header facets and both sections are unchanged
 
 ---
 
-## Architecture After Exercise 11
+## Notes and Limitations
+
+- **Link only in the List Report.** As in the course, only `@UI.lineItem` gets `#WITH_URL`. On the Object Page, *Company Name* stays plain text. The same `type`/`url` properties could also be added to `@UI.identification` if a link is wanted there.
+- **Special characters.** The company name is inserted into the URL unencoded. Names with characters such as `&` or `#` may produce an incomplete search. Spaces are handled by the browser. For a training exercise this is acceptable.
+- **Alternative target.** The view already contains `CustomerURL` (the customer's web site). `url: 'CustomerURL'` would link to the customer's own site instead of a search.
+- **Customer data in an external URL.** The company name is sent to an external search engine. This is fine for EPM demo data; in real applications, check data protection before sending business data to external services.
+
+---
+
+## Architecture After Exercise 12
 
 ```text
-ZCDS_UX403_SADL_00                       (unchanged in Ex11)
+ZCDS_UX403_SADL_00
+        |
+        |-- search semantics
+        |-- value-help association
+        |-- amount/currency semantics
+        |-- business and status fields
+        |-- SearchURL (concat)                    <- new
         |
         +---- ZCDS_UX403_SADL_00_UI
         |       |
         |       |-- header info
-        |       |-- line items / selection fields
-        |       |-- identification
-        |       |-- field groups AMOUNT, STATUS
-        |       |-- facets
-        |       |     |-- header facets: Amounts, Status
-        |       |     |-- COLLFAC1 General Information
-        |       |     |     +-- identification reference
-        |       |     +-- COLLFAC2 Additional Information      <- new
-        |       |           |-- field group AMOUNT             <- new
-        |       |           +-- field group STATUS             <- new
-        |       +-- visibility / importance
+        |       |-- line items
+        |       |     +-- CustomerName #WITH_URL  <- new
+        |       |-- selection fields
+        |       |-- identification / field groups
+        |       |-- facets (header + 2 sections)
+        |       +-- hidden: CurrencyCode, SearchURL   <- new
         |
         v
 ZCDS_UX403_SADL_00_CDS
         |
         v
 Fiori Elements application
-  List Report  --select row-->  Object Page (header facets + 2 sections)
+  List Report (Company Name link → Google)  --select row-->  Object Page
 ```
 
 ---
 
-## Exercise 11 Status
+## Exercise 12 Status
 
-**Exercise 11 completed.**
+Planned:
 
-- ✅ branch switched and pulled in the development system
-- ✅ collection facet `COLLFAC2` *Additional Information* added
-- ✅ field-group reference facets AMOUNT and STATUS added under `COLLFAC2`
-- ✅ Metadata Extension activated
-- ✅ backend pushed to GitHub with abapGit
-- ✅ sections validated in the Fiori Elements application
-- ✅ Exercises 07 to 10 regression-tested
+- [ ] branch switched and pulled in the development system
+- [ ] `SearchURL` added to the CDS view
+- [ ] `CustomerName` line item changed to `#WITH_URL` with `url: 'SearchURL'`
+- [ ] `SearchURL` hidden
+- [ ] CDS view and Metadata Extension activated
+- [ ] backend pushed to GitHub with abapGit
+- [ ] link validated in the Fiori Elements application
+- [ ] Exercises 07 to 11 regression-tested
 
 ---
 
@@ -316,6 +300,8 @@ main
                               +-- ux403-ex10-header-facets
                                      |
                                      +-- ux403-ex11-body-facets
+                                            |
+                                            +-- ux403-ex12-external-url
 ```
 
 Each exercise branch represents the cumulative application state at that stage of the UX403 training.
@@ -324,4 +310,4 @@ Each exercise branch represents the cumulative application state at that stage o
 
 ## Source
 
-Exercise content based on *UX403, Unit 4, Exercise 11: Add Sections and Facets to the Object Page*. The course material is not part of this repository.
+Exercise content based on *UX403, Unit 5, Exercise 12: Navigate to an External URL*. The course material is not part of this repository.
