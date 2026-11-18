@@ -1,0 +1,7 @@
+# --------------------------------------------------------------------
+# Training material (course PDFs, extracted chapters, handouts)
+# Kept locally for reference only - never committed or pushed.
+# Matches PDF files in every folder of the repository.
+# --------------------------------------------------------------------
+*.pdf
+*.PDF

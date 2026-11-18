@@ -1,25 +1,25 @@
-# UX403 Exercise 08: Search and Filtering
+# UX403 Exercise 09: Build a Basic Object Page with CDS Annotation
 
 ## Objective
 
-This branch implements the backend concepts of UX403 Exercise 08: Search and Filtering.
+This branch implements UX403 Exercise 09: a basic **Object Page** for the existing Sales Order List Report.
 
-Unlike the standard UX403 training approach, the existing CDS view, Metadata Extension, OData service and Fiori Elements application are reused and enhanced incrementally.
+When a user selects a sales order in the List Report, the Object Page shows a header (type name and title) and a **General Information** section with the main sales order fields.
 
-The Metadata Extension created in Exercise 06 remains part of the solution and is the preferred location for UI presentation annotations.
+As in the previous exercises, the existing CDS view, Metadata Extension, OData service and Fiori Elements application are reused and enhanced. No new objects are created.
 
 ---
 
 ## Branch
 
 ```text
-ux403-ex08-search-filter
+ux403-ex09-object-page
 ```
 
 Parent branch:
 
 ```text
-ux403-ex07-basic-list-report
+ux403-ex08-search-filter
 ```
 
 The branch history is intentionally cumulative.
@@ -28,20 +28,20 @@ The branch history is intentionally cumulative.
 
 ## Training Deviation
 
-Official UX403 exercises typically introduce new CDS views and may create new Fiori Elements applications for individual exercises.
+The official exercise creates a new set of objects from a template:
 
-This repository follows a different strategy:
+| Official exercise | This repository |
+|---|---|
+| New CDS view `ZCDS_UX403_OBJP_##` from a template file | Existing CDS view `ZCDS_UX403_SADL_00` |
+| Annotations directly in the CDS view | UI annotations in the existing Metadata Extension `ZCDS_UX403_SADL_00_UI` |
+| New OData service `ZCDS_UX403_OBJP_##_CDS`, registered in `/IWFND/MAINT_SERVICE` | Existing service `ZCDS_UX403_SADL_00_CDS` (already registered) |
+| New Fiori Elements project (template *List Report Object Page*) | Existing Fiori Elements application in SAP Business Application Studio |
+
+Therefore the official **Task 1, Task 2 and Task 3 are skipped**. Only Task 4 (*Add Annotations for the Object Page*) is implemented, applied to the existing objects.
 
 ```text
-One evolving CDS view
-One Metadata Extension
-One OData service
-One Fiori Elements application
+One CDS view · One Metadata Extension · One OData service · One Fiori Elements app
 ```
-
-Each exercise builds on the previous exercise.
-
-The goal is to observe how an existing application evolves as CDS and UI annotations are added incrementally.
 
 ---
 
@@ -53,329 +53,195 @@ ZCODE_GIT_FIORIELEMENTS-SADL
 
 ---
 
-## Active Backend Objects
+## Objects Changed in Exercise 09
 
-### CDS Data Definition
-
-```text
-ZCDS_UX403_SADL_00
-```
-
-Responsibilities:
-
-- expose sales order data
-- define searchable fields
-- expose fields used for structured filtering
-- provide Customer value help
-- provide calculated TaxAmount
-- define amount/currency semantics
-- expose the CDS view through the existing OData service
-
-### Metadata Extension
-
-```text
-ZCDS_UX403_SADL_00_UI
-```
-
-Responsibilities:
-
-- List Report header configuration
-- line item configuration
-- column ordering
-- field importance
-- responsive behavior
-- selection fields
-- UI visibility
-
-### Generated OData Service
-
-```text
-ZCDS_UX403_SADL_00_CDS
-```
-
-The existing service continues to be reused.
-
-No additional OData service is created for Exercise 08.
-
----
-
-## Exercise 07 Baseline
-
-Exercise 08 builds on the completed Exercise 07 implementation.
-
-The List Report contains:
-
-| Position | Field | Importance |
+| Object | Type | Change |
 |---|---|---|
-| 10 | SalesOrderID | HIGH |
-| 20 | CustomerID | HIGH |
-| 30 | CustomerName | HIGH |
-| 40 | GrossAmount | HIGH |
-| 50 | NetAmount | HIGH |
-| 60 | TaxAmount | LOW |
-
-Exercise 07 also introduced:
-
-- custom data element `ZUX403_TAX_AMOUNT`
-- TaxAmount currency semantics
-- hidden standalone CurrencyCode field
-- responsive `#LOW` importance for TaxAmount
-
-These features remain part of the cumulative application.
+| `ZCDS_UX403_SADL_00` | CDS Data Definition | add fields `OverallStatus` and `PaymentMethod` |
+| `ZCDS_UX403_SADL_00_UI` | Metadata Extension | add `@UI.identification` and `@UI.facet` |
+| `ZCDS_UX403_SADL_00_CDS` | Generated OData service | no manual change; metadata is regenerated on activation |
 
 ---
 
-# Exercise 08 Features
+## Exercise 08 Baseline
 
-## Search Support
+Exercise 09 builds on the completed Exercise 08 implementation:
 
-The CDS view is enabled for search:
+- List Report with line items (positions 10–60) and responsive importance
+- `TaxAmount` with custom data element `ZUX403_TAX_AMOUNT` and currency semantics
+- free-text search on `SalesOrderID`, `CustomerID`, `CustomerName`, `CustomerEmailAddress`
+- selection fields `CustomerID` and `CreationDate`
+- Customer value help through association `_CustomerVH` to `ZC_UX403CustomerVH`
+
+### Already in place since Exercise 06
+
+The official Task 4, steps 1 and 2, require:
+
+| Step | Annotation | Status |
+|---|---|---|
+| Type name *Sales Order* | `@UI.headerInfo.typeName` | already in the Metadata Extension |
+| Title = `SalesOrderID` | `@UI.headerInfo.title.value` | already in the Metadata Extension |
 
 ```abap
-@Search.searchable: true
+@UI.headerInfo: { typeName: 'Sales Order',
+                  typeNamePlural: 'Sales Orders',
+                  title: { type: #STANDARD, value: 'SalesOrderID' } }
 ```
 
-Multiple properties participate in the free-text search using:
+No change is needed for these two steps.
+
+---
+
+# Exercise 09 Features
+
+## Object Page Header
+
+Provided by the existing `@UI.headerInfo` (see above):
+
+```text
+Sales Order                <- typeName
+4711                       <- title.value = SalesOrderID
+```
+
+---
+
+## Identification Fields
+
+The Object Page shows these fields through `@UI.identification`:
+
+| Position | Field | Status before Ex09 |
+|---|---|---|
+| 10 | SalesOrderID | exists |
+| 20 | CustomerID | exists |
+| 30 | CustomerName | exists |
+| 40 | GrossAmount | exists |
+| 50 | NetAmount | exists |
+| 60 | OverallStatus | **new field** |
+| 70 | PaymentMethod | **new field** |
+
+---
+
+## Facets
+
+| Facet | Property | Value |
+|---|---|---|
+| Collection facet | id | `COLLFAC1` |
+| | label | General Information |
+| | type | `#COLLECTION` |
+| | position | 10 |
+| Identification reference facet | label | General Information |
+| | type | `#IDENTIFICATION_REFERENCE` |
+| | parentId | `COLLFAC1` |
+| | position | 10 |
+
+```text
+Object Page
+  └─ Section "General Information"          (#COLLECTION, id COLLFAC1)
+       └─ Sub-section "General Information" (#IDENTIFICATION_REFERENCE)
+            └─ all @UI.identification fields (positions 10–70)
+```
+
+---
+
+## Annotation Placement
+
+| Annotation | Location | Reason |
+|---|---|---|
+| new fields `OverallStatus`, `PaymentMethod` | CDS Data Definition | data model |
+| `@UI.identification` | Metadata Extension | UI presentation |
+| `@UI.facet` | Metadata Extension (on `SalesOrderID`) | UI presentation |
+| `@UI.headerInfo` | Metadata Extension | unchanged since Ex06 |
+
+`@UI.facet` describes the whole page, but it must be attached to an element. By convention it is placed on the key field `SalesOrderID`.
+
+---
+
+# Implementation Steps
+
+Develop in **ADT (Eclipse)** in the SAP system. Do not edit files in `src/` by hand (see `README.md` on `main`).
+
+## 1. Prepare the system
+
+1. In abapGit, switch the repository to branch `ux403-ex09-object-page`.
+2. Pull, so that the system has the current Exercise 08 state.
+3. Check that no local changes are pending (no diff icon in abapGit).
+
+---
+
+## 2. Add the new fields to the CDS view
+
+In `ZCDS_UX403_SADL_00`, add the two fields to the projection list, for example after `TaxAmount`:
 
 ```abap
-@Search.defaultSearchElement: true
+      SalesOrderOverallStatus        as OverallStatus,
+
+      SalesOrderPaymentMethod        as PaymentMethod,
 ```
 
-The searchable properties are:
+> **Verify the source field names first.** The names `SalesOrderOverallStatus` and `SalesOrderPaymentMethod` are expected names in `SEPM_I_SalesOrder`, but they have not been checked in the system yet. Open `SEPM_I_SalesOrder` in ADT (F3) or use code completion (Ctrl+Space) and adjust the names if needed.
 
-```text
-SalesOrderID
-CustomerID
-CustomerName
-CustomerEmailAddress
-```
-
-This allows the Fiori Elements List Report search field to perform free-text searches across multiple backend properties.
+Activate the CDS view.
 
 ---
 
-## Additional CDS Fields
+## 3. Add identification annotations to the Metadata Extension
 
-Exercise 08 extends the existing CDS view with additional information required by the searching and filtering scenario:
-
-```text
-CustomerURL
-CustomerEmailAddress
-CreationDate
-```
-
-`CreationDate` is derived from the sales order creation timestamp and exposed as an ABAP date.
-
-The existing Exercise 07 fields remain unchanged.
-
----
-
-## Structured Filtering
-
-Exercise 08 introduces structured filter fields using UI selection-field annotations.
-
-The filter fields are:
-
-| Position | Field |
-|---|---|
-| 10 | CustomerID |
-| 20 | CreationDate |
-
-These annotations are maintained in the existing Metadata Extension.
-
-This maintains the separation between:
-
-```text
-CDS model / semantics
-        +
-Metadata Extension / UI presentation
-```
-
----
-
-## Customer Value Help
-
-CustomerID receives a value help based on:
-
-```text
-C_UX403CustomerVH
-```
-
-The CDS contains an association:
+In `ZCDS_UX403_SADL_00_UI`, add `@UI.identification` to each field. Keep the existing `@UI.lineItem` and `@UI.selectionField` annotations. Reuse the List Report labels for a consistent UI.
 
 ```abap
-association [1..1] to C_UX403CustomerVH as _CustomerVH
+  @UI.lineItem:       [ { position: 10, importance: #HIGH, label: 'Sales Order ID' } ]
+  @UI.identification: [ { position: 10, label: 'Sales Order ID' } ]
+  SalesOrderID;
+
+  @UI.lineItem:       [ { position: 20, importance: #HIGH, label: 'BP ID' } ]
+  @UI.selectionField: [ { position: 10 } ]
+  @UI.identification: [ { position: 20, label: 'BP ID' } ]
+  CustomerID;
+
+  @UI.lineItem:       [ { position: 30, importance: #HIGH, label: 'Company Name' } ]
+  @UI.identification: [ { position: 30, label: 'Company Name' } ]
+  CustomerName;
+
+  @UI.lineItem:       [ { position: 40, importance: #HIGH, label: 'Gross Amount' } ]
+  @UI.identification: [ { position: 40, label: 'Gross Amount' } ]
+  GrossAmount;
+
+  @UI.lineItem:       [ { position: 50, importance: #HIGH, label: 'Net Amount' } ]
+  @UI.identification: [ { position: 50, label: 'Net Amount' } ]
+  NetAmount;
+
+  @UI.identification: [ { position: 60, label: 'Overall Status' } ]
+  OverallStatus;
+
+  @UI.identification: [ { position: 70, label: 'Payment Method' } ]
+  PaymentMethod;
 ```
 
-connected through the projected `CustomerID`.
+---
 
-The value help is assigned using:
+## 4. Add the facets to the Metadata Extension
+
+Add `@UI.facet` on `SalesOrderID`:
 
 ```abap
-@Consumption.valueHelp: '_CustomerVH'
+  @UI.facet: [ { id:       'COLLFAC1',
+                 type:     #COLLECTION,
+                 label:    'General Information',
+                 position: 10 },
+               { type:     #IDENTIFICATION_REFERENCE,
+                 label:    'General Information',
+                 parentId: 'COLLFAC1',
+                 position: 10 } ]
+  @UI.lineItem:       [ { position: 10, importance: #HIGH, label: 'Sales Order ID' } ]
+  @UI.identification: [ { position: 10, label: 'Sales Order ID' } ]
+  SalesOrderID;
 ```
 
-The association is exposed by the CDS so that the generated OData metadata can represent the value-help relationship.
-
-### Annotation Placement
-
-`@Consumption.valueHelp` remains in the CDS Data Definition.
-
-It is intentionally not maintained in the Metadata Extension because the SAP system used for this exercise (IDES) does not permit `Consumption.valueHelp` in metadata extensions. Keeping it in the CDS view also makes the solution portable between the connected systems.
-
-UI-specific annotations such as:
-
-```text
-@UI.selectionField
-@UI.lineItem
-@UI.hidden
-@UI.headerInfo
-```
-
-remain in the Metadata Extension where applicable.
+Activate the Metadata Extension.
 
 ---
 
-## Search vs. Filter
-
-Exercise 08 demonstrates two related but distinct mechanisms.
-
-### Free-Text Search
-
-```text
-Fiori Elements Search
-        |
-        v
-@Search.searchable
-        |
-        v
-@Search.defaultSearchElement
-        |
-        v
-multiple CDS properties
-```
-
-### Structured Filtering
-
-```text
-Fiori Elements Filter Bar
-        |
-        v
-@UI.selectionField
-        |
-        +--> CustomerID
-        |      |
-        |      v
-        |   Value Help
-        |
-        +--> CreationDate
-```
-
-The distinction is important: search operates across selected searchable properties whereas selection fields expose specific properties as structured filter criteria.
-
----
-
-## Architecture After Exercise 08
-
-```text
-ZCDS_UX403_SADL_00
-        |
-        |-- search semantics
-        |-- value-help association
-        |-- amount/currency semantics
-        |-- business fields
-        |
-        +---- ZCDS_UX403_SADL_00_UI
-        |       |
-        |       |-- header
-        |       |-- line items
-        |       |-- selection fields
-        |       |-- visibility
-        |       +-- responsive importance
-        |
-        v
-ZCDS_UX403_SADL_00_CDS
-        |
-        v
-Fiori Elements application
-```
-
----
-
-## Exercise 08 Backend Status
-
-Completed:
-
-- existing CDS reused
-- existing Metadata Extension reused
-- existing OData service reused
-- `@Search.searchable` enabled
-- default search elements configured
-- CustomerURL exposed
-- CustomerEmailAddress exposed
-- CreationDate exposed
-- CustomerID selection field configured
-- CreationDate selection field configured
-- Customer value-help association added
-- `@Consumption.valueHelp` configured in the CDS
-- CDS activated
-- Metadata Extension activated
-- backend changes committed and pushed to GitHub
-
-No new Fiori Elements project was created.
-
----
-
-## UI Validation Status
-
-Backend implementation is complete.
-
-For this exercise, the backend was developed and OData-verified in **IDES** and pushed to this branch with abapGit. This was a choice for this exercise, not a fixed role: backend development is possible in either connected system (see the `README.md` on `main`).
-
-Fiori Elements validation is done in the **company sandbox**, because the connection to SAP Business Application Studio is already set up there. The Ex08 backend therefore has to be pulled into the sandbox with abapGit first, which also exercises the abapGit round trip between both systems.
-
-The sandbox setup for UI validation:
-
-```text
-Company SAP Sandbox
-        |
-        v
-OData Service
-        |
-        v
-SAP Cloud Connector
-        |
-        v
-BTP Destination
-        |
-        v
-SAP Business Application Studio
-        |
-        v
-existing Fiori Elements application
-```
-
----
-
-# Next Steps
-
-## 1. Import Exercise 08 into the company sandbox
-
-Using abapGit, fetch and switch to:
-
-```text
-ux403-ex08-search-filter
-```
-
-Import the Exercise 08 backend state into the sandbox system.
-
-Verify that the relevant CDS, Metadata Extension and service-related objects are active after the import.
-
----
-
-## 2. Verify OData in the sandbox
-
-Before testing Fiori Elements, verify the service directly.
+## 5. Verify the OData service
 
 Service:
 
@@ -383,110 +249,103 @@ Service:
 ZCDS_UX403_SADL_00_CDS
 ```
 
-Check:
+Check `$metadata` and the entity set:
 
-```text
-$metadata
-```
+- the entity type contains `OverallStatus` and `PaymentMethod`
+- the annotations contain `UI.Identification` and `UI.Facets` (look in the annotation model `ZCDS_UX403_SADL_00_CDS_VAN`)
 
-and the entity set.
-
-Verify in particular that the generated metadata contains the new Exercise 08 search, filtering and value-help metadata.
+If the old metadata is still returned, clear the metadata cache (`/IWFND/CACHE_CLEANUP` on the hub, `/IWBEP/CACHE_CLEANUP` on the backend) and reload.
 
 ---
 
-## 3. Connect the existing Fiori Elements application
+## 6. Push the backend to GitHub
 
-Reuse the existing application in SAP Business Application Studio.
+In abapGit:
 
-Do not generate another Fiori Elements application unless required for troubleshooting.
-
-Use the existing BTP Destination and SAP Cloud Connector connection to access the sandbox OData service.
-
----
-
-## 4. Validate Free-Text Search
-
-Verify that the List Report search field searches the intended properties:
-
-```text
-SalesOrderID
-CustomerID
-CustomerName
-CustomerEmailAddress
-```
-
-Test with known values from the sandbox data.
+1. Stage the changed objects (CDS view, Metadata Extension and any changed service files).
+2. Commit, for example: `Ex09: add object page facets and identification`.
+3. Push to `ux403-ex09-object-page`.
 
 ---
 
-## 5. Validate Structured Filtering
+## 7. Validate in the Fiori Elements application
 
-Verify that the filter bar provides:
+Use the existing application in SAP Business Application Studio, connected to the company sandbox through the BTP Destination and SAP Cloud Connector. Do not generate a new application.
 
-```text
-CustomerID
-CreationDate
-```
+1. Start the application and choose **Go**.
+2. Select a sales order row.
+3. Check the Object Page:
+   - header shows *Sales Order* and the `SalesOrderID`
+   - section **General Information** exists
+   - fields are shown in the order 10–70, including `OverallStatus` and `PaymentMethod`
 
-Confirm that filters are transferred correctly to the OData service and restrict the List Report results.
-
----
-
-## 6. Validate Customer Value Help
-
-Open the value help for:
-
-```text
-CustomerID
-```
-
-Confirm that the value help is provided through:
-
-```text
-C_UX403CustomerVH
-```
-
-and that selecting a CustomerID correctly filters the List Report.
+> If selecting a row does not navigate, check that the existing app was created with the *List Report Object Page* template and that `manifest.json` contains the Object Page route and target.
 
 ---
 
-## 7. Regression-Test Exercise 07
-
-Exercise 08 must not regress the cumulative Exercise 07 functionality.
+## 8. Regression-test Exercises 07 and 08
 
 Verify that the List Report still provides:
 
-- Sales Order header
-- existing line items
-- GrossAmount and NetAmount
-- TaxAmount
-- TaxAmount currency formatting
-- hidden standalone CurrencyCode
-- responsive TaxAmount behavior
+- all existing line items, labels and responsive `TaxAmount`
+- `TaxAmount` currency formatting and hidden `CurrencyCode`
+- free-text search across the four searchable fields
+- filter fields `CustomerID` and `CreationDate`
+- Customer value help on `CustomerID`
+
+The new fields `OverallStatus` and `PaymentMethod` should **not** appear as List Report columns, because they have no `@UI.lineItem` annotation.
 
 ---
 
-## 8. Complete Exercise 08
-
-Exercise 08 should only be considered fully validated after the backend imported from this branch has been tested using the existing Fiori Elements application in the company sandbox.
-
-If validation succeeds, continue with:
+## Architecture After Exercise 09
 
 ```text
-Exercise 09
-Object Page
+ZCDS_UX403_SADL_00
+        |
+        |-- search semantics
+        |-- value-help association
+        |-- amount/currency semantics
+        |-- business fields (+ OverallStatus, PaymentMethod)
+        |
+        +---- ZCDS_UX403_SADL_00_UI
+        |       |
+        |       |-- header (List Report + Object Page)
+        |       |-- line items
+        |       |-- selection fields
+        |       |-- identification            <- new
+        |       |-- facets                    <- new
+        |       +-- visibility / importance
+        |
+        v
+ZCDS_UX403_SADL_00_CDS
+        |
+        v
+Fiori Elements application
+  List Report  --select row-->  Object Page
 ```
 
-Create the next branch from:
+---
 
-```text
-ux403-ex08-search-filter
-```
+## Exercise 09 Status
 
-not from `main`.
+Planned:
 
-Expected branch:
+- [ ] branch switched and pulled in the development system
+- [ ] source field names verified in `SEPM_I_SalesOrder`
+- [ ] `OverallStatus` and `PaymentMethod` added to the CDS view
+- [ ] `@UI.identification` added (positions 10–70)
+- [ ] `@UI.facet` added (collection + identification reference)
+- [ ] CDS view and Metadata Extension activated
+- [ ] `$metadata` verified
+- [ ] backend pushed to GitHub with abapGit
+- [ ] Object Page validated in the Fiori Elements application
+- [ ] Exercises 07 and 08 regression-tested
+
+---
+
+## Next Exercise
+
+After successful validation, create the next branch from:
 
 ```text
 ux403-ex09-object-page
@@ -510,4 +369,8 @@ main
 
 Each exercise branch represents the cumulative application state at that stage of the UX403 training.
 
-The repository therefore acts both as source control and as a reproducible history of the incremental Fiori Elements application development.
+---
+
+## Source
+
+Exercise content based on *UX403, Unit 4, Exercise 9: Build a Basic Object Page with CDS Annotation*. The course material is not part of this repository.
