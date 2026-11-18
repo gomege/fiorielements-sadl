@@ -48,9 +48,16 @@ define view ZCDS_UX403_SADL_00
         - NetAmountInTransactionCurrency
         as zux403_tax_amount
       )                              as TaxAmount,
-      SalesOrderOverallStatus       as OverallStatus,
       
-      SalesOrderPaymentMethod       as PaymentMethod,
+      SalesOrderOverallStatus        as OverallStatus,
+
+      SalesOrderBillingStatus        as BillingStatus,
+
+      SalesOrderDeliveryStatus       as DeliveryStatus,
+
+      SalesOrderLifeCycleStatus      as LifeCycleStatus,
+
+      SalesOrderPaymentMethod        as PaymentMethod,
 
       _CustomerVH
 }

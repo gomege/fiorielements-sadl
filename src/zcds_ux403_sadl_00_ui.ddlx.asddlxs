@@ -7,7 +7,19 @@
 annotate view ZCDS_UX403_SADL_00 with
 
 {
-  @UI.facet: [ { id:       'COLLFAC1',
+  @UI.facet: [ /* Ex10: header facets */
+               { purpose:         #HEADER,
+                 type:            #FIELDGROUP_REFERENCE,
+                 targetQualifier: 'AMOUNT',
+                 label:           'Amounts',
+                 position:        10 },
+               { purpose:         #HEADER,
+                 type:            #FIELDGROUP_REFERENCE,
+                 targetQualifier: 'STATUS',
+                 label:           'Status',
+                 position:        20 },
+               /* Ex09: content section */
+               { id:       'COLLFAC1',
                  type:     #COLLECTION,
                  label:    'General Information',
                  position: 10 },
@@ -33,14 +45,26 @@ annotate view ZCDS_UX403_SADL_00 with
 
   @UI.lineItem:       [ { position: 40, importance: #HIGH, label: 'Gross Amount' } ]
   @UI.identification: [ { position: 40, label: 'Gross Amount' } ]
+  @UI.fieldGroup:     [ { qualifier: 'AMOUNT', position: 10, label: 'Gross Amount' } ]
   GrossAmount;
 
   @UI.lineItem:       [ { position: 50, importance: #HIGH, label: 'Net Amount' } ]
   @UI.identification: [ { position: 50, label: 'Net Amount' } ]
+  @UI.fieldGroup:     [ { qualifier: 'AMOUNT', position: 20, label: 'Net Amount' } ]
   NetAmount;
 
   @UI.identification: [ { position: 60, label: 'Overall Status' } ]
+  @UI.fieldGroup:     [ { qualifier: 'STATUS', position: 10, label: 'Overall Status' } ]
   OverallStatus;
+
+  @UI.fieldGroup:     [ { qualifier: 'STATUS', position: 20, label: 'Billing Status' } ]
+  BillingStatus;
+
+  @UI.fieldGroup:     [ { qualifier: 'STATUS', position: 30, label: 'Delivery Status' } ]
+  DeliveryStatus;
+
+  @UI.fieldGroup:     [ { qualifier: 'STATUS', position: 40, label: 'Life Cycle Status' } ]
+  LifeCycleStatus;
 
   @UI.identification: [ { position: 70, label: 'Payment Method' } ]
   PaymentMethod;
