@@ -1,10 +1,13 @@
-# UX403 Exercise 09: Build a Basic Object Page with CDS Annotation
+# UX403 Exercise 10: Add Header Facets
 
 ## Objective
 
-This branch implements UX403 Exercise 09: a basic **Object Page** for the existing Sales Order List Report.
+This branch implements UX403 Exercise 10: **header facets** on the Object Page of the existing Sales Order application.
 
-When a user selects a sales order in the List Report, the Object Page shows a header (type name and title) and a **General Information** section with the main sales order fields.
+Two groups of fields are added to the Object Page header area:
+
+- **Amounts**: Gross Amount and Net Amount
+- **Status**: Overall, Billing, Delivery and Life Cycle Status
 
 As in the previous exercises, the existing CDS view, Metadata Extension, OData service and Fiori Elements application are reused and enhanced. No new objects are created.
 
@@ -13,13 +16,13 @@ As in the previous exercises, the existing CDS view, Metadata Extension, OData s
 ## Branch
 
 ```text
-ux403-ex09-object-page
+ux403-ex10-header-facets
 ```
 
 Parent branch:
 
 ```text
-ux403-ex08-search-filter
+ux403-ex09-object-page
 ```
 
 The branch history is intentionally cumulative.
@@ -28,16 +31,16 @@ The branch history is intentionally cumulative.
 
 ## Training Deviation
 
-The official exercise creates a new set of objects from a template:
+The official exercise again creates a new set of objects from a template:
 
 | Official exercise | This repository |
 |---|---|
-| New CDS view `ZCDS_UX403_OBJP_##` from a template file | Existing CDS view `ZCDS_UX403_SADL_00` |
+| New CDS view `ZCDS_UX403_HDFT_##` from a template file | Existing CDS view `ZCDS_UX403_SADL_00` |
 | Annotations directly in the CDS view | UI annotations in the existing Metadata Extension `ZCDS_UX403_SADL_00_UI` |
-| New OData service `ZCDS_UX403_OBJP_##_CDS`, registered in `/IWFND/MAINT_SERVICE` | Existing service `ZCDS_UX403_SADL_00_CDS` (already registered) |
+| New OData service `ZCDS_UX403_HDFT_##_CDS`, registered in `/IWFND/MAINT_SERVICE` | Existing service `ZCDS_UX403_SADL_00_CDS` (already registered) |
 | New Fiori Elements project (template *List Report Object Page*) | Existing Fiori Elements application in SAP Business Application Studio |
 
-Therefore the official **Task 1, Task 2 and Task 3 are skipped**. Only Task 4 (*Add Annotations for the Object Page*) is implemented, applied to the existing objects.
+Therefore the official **Task 1, Task 2 and Task 3 are skipped**. Tasks 4, 5 and 6 are implemented on the existing objects.
 
 ```text
 One CDS view · One Metadata Extension · One OData service · One Fiori Elements app
@@ -53,106 +56,77 @@ ZCODE_GIT_FIORIELEMENTS-SADL
 
 ---
 
-## Objects Changed in Exercise 09
+## Objects Changed in Exercise 10
 
 | Object | Type | Change |
 |---|---|---|
-| `ZCDS_UX403_SADL_00` | CDS Data Definition | add fields `OverallStatus` and `PaymentMethod` |
-| `ZCDS_UX403_SADL_00_UI` | Metadata Extension | add `@UI.identification` and `@UI.facet` |
+| `ZCDS_UX403_SADL_00` | CDS Data Definition | add fields `BillingStatus`, `DeliveryStatus`, `LifeCycleStatus` |
+| `ZCDS_UX403_SADL_00_UI` | Metadata Extension | add `@UI.fieldGroup` (AMOUNT, STATUS) and two header facets in `@UI.facet` |
 | `ZCDS_UX403_SADL_00_CDS` | Generated OData service | no manual change; metadata is regenerated on activation |
 
 ---
 
-## Exercise 08 Baseline
+## Exercise 09 Baseline
 
-Exercise 09 builds on the completed Exercise 08 implementation:
+Exercise 10 builds on the completed Exercise 09 implementation:
 
-- List Report with line items (positions 10–60) and responsive importance
-- `TaxAmount` with custom data element `ZUX403_TAX_AMOUNT` and currency semantics
-- free-text search on `SalesOrderID`, `CustomerID`, `CustomerName`, `CustomerEmailAddress`
-- selection fields `CustomerID` and `CreationDate`
-- Customer value help through association `_CustomerVH` to `ZC_UX403CustomerVH`
+- List Report with line items, responsive `TaxAmount` (line-item position 80)
+- free-text search, filter fields `CustomerID` and `CreationDate`, Customer value help
+- Object Page header from `@UI.headerInfo` (type name *Sales Order*, title `SalesOrderID`)
+- Object Page section **General Information** (`COLLFAC1` + identification reference) with fields at positions 10–70
+- fields `OverallStatus` and `PaymentMethod` (`PaymentMethod` has no data in the demo system)
 
-### Already in place since Exercise 06
+### Already in place
 
-The official Task 4, steps 1 and 2, require:
-
-| Step | Annotation | Status |
-|---|---|---|
-| Type name *Sales Order* | `@UI.headerInfo.typeName` | already in the Metadata Extension |
-| Title = `SalesOrderID` | `@UI.headerInfo.title.value` | already in the Metadata Extension |
-
-```abap
-@UI.headerInfo: { typeName: 'Sales Order',
-                  typeNamePlural: 'Sales Orders',
-                  title: { type: #STANDARD, value: 'SalesOrderID' } }
-```
-
-No change is needed for these two steps.
+| Required by Ex10 | Status |
+|---|---|
+| `GrossAmount`, `NetAmount` | exist since Ex05/Ex07 |
+| `OverallStatus` | exists since Ex09 |
+| `BillingStatus`, `DeliveryStatus`, `LifeCycleStatus` | **new fields** |
 
 ---
 
-# Exercise 09 Features
+# Exercise 10 Features
 
-## Object Page Header
+## Field Groups
 
-Provided by the existing `@UI.headerInfo` (see above):
+A field group is a named set of fields. The name is the **qualifier**. A field can belong to several field groups and still keep its `@UI.lineItem` and `@UI.identification` annotations.
 
-```text
-Sales Order                <- typeName
-4711                       <- title.value = SalesOrderID
-```
+### AMOUNT
 
----
+| Position | Field |
+|---|---|
+| 10 | GrossAmount |
+| 20 | NetAmount |
 
-## Identification Fields
+### STATUS
 
-The Object Page shows these fields through `@UI.identification`:
-
-| Position | Field | Status before Ex09 |
-|---|---|---|
-| 10 | SalesOrderID | exists |
-| 20 | CustomerID | exists |
-| 30 | CustomerName | exists |
-| 40 | GrossAmount | exists |
-| 50 | NetAmount | exists |
-| 60 | OverallStatus | **new field** |
-| 70 | PaymentMethod | **new field** |
-
-### Known Data Limitation: PaymentMethod is empty
-
-`PaymentMethod` is displayed on the Object Page but shows **no value for any sales order**.
-
-This is a property of the EPM demo data in the system, not an implementation error. A check in the ADT SQL Console confirmed that `SalesOrderPaymentMethod` is empty for all sales orders:
-
-```sql
-SELECT SalesOrderPaymentMethod, COUNT(*) AS cnt
-  FROM SEPM_I_SalesOrder
- GROUP BY SalesOrderPaymentMethod
-```
-
-The field is kept because the exercise requires it and the annotation is correct.
+| Position | Field |
+|---|---|
+| 10 | OverallStatus |
+| 20 | BillingStatus |
+| 30 | DeliveryStatus |
+| 40 | LifeCycleStatus |
 
 ---
 
-## Facets
+## Header Facets
 
-| Facet | Property | Value |
+| Header facet | Position | Target |
 |---|---|---|
-| Collection facet | id | `COLLFAC1` |
-| | label | General Information |
-| | type | `#COLLECTION` |
-| | position | 10 |
-| Identification reference facet | label | General Information |
-| | type | `#IDENTIFICATION_REFERENCE` |
-| | parentId | `COLLFAC1` |
-| | position | 10 |
+| Amounts | 10 | field group `AMOUNT` |
+| Status | 20 | field group `STATUS` |
+
+A facet is placed in the header with `purpose: #HEADER`. It shows a field group with `type: #FIELDGROUP_REFERENCE` and `targetQualifier: '<qualifier>'`.
 
 ```text
 Object Page
-  └─ Section "General Information"          (#COLLECTION, id COLLFAC1)
-       └─ Sub-section "General Information" (#IDENTIFICATION_REFERENCE)
-            └─ all @UI.identification fields (positions 10–70)
+  ├─ Header
+  │    ├─ title: Sales Order <SalesOrderID>      (@UI.headerInfo, since Ex06)
+  │    ├─ Amounts   (#HEADER, #FIELDGROUP_REFERENCE → AMOUNT)   <- new
+  │    └─ Status    (#HEADER, #FIELDGROUP_REFERENCE → STATUS)   <- new
+  └─ Section "General Information"               (since Ex09)
+       └─ identification fields 10–70
 ```
 
 ---
@@ -161,12 +135,11 @@ Object Page
 
 | Annotation | Location | Reason |
 |---|---|---|
-| new fields `OverallStatus`, `PaymentMethod` | CDS Data Definition | data model |
-| `@UI.identification` | Metadata Extension | UI presentation |
-| `@UI.facet` | Metadata Extension (on `SalesOrderID`) | UI presentation |
-| `@UI.headerInfo` | Metadata Extension | unchanged since Ex06 |
+| new status fields | CDS Data Definition | data model |
+| `@UI.fieldGroup` | Metadata Extension | UI presentation |
+| header facets in `@UI.facet` | Metadata Extension (on `SalesOrderID`) | UI presentation; extends the existing facet list |
 
-`@UI.facet` describes the whole page, but it must be attached to an element. By convention it is placed on the key field `SalesOrderID`.
+There is only **one** `@UI.facet` annotation. The new header facets are added as further entries to the existing list from Ex09.
 
 ---
 
@@ -176,33 +149,75 @@ Develop in **ADT (Eclipse)** in the SAP system. Do not edit files in `src/` by h
 
 ## 1. Prepare the system
 
-1. In abapGit, switch the repository to branch `ux403-ex09-object-page`.
-2. Pull, so that the system has the current Exercise 08 state.
+1. In abapGit, switch the repository to branch `ux403-ex10-header-facets`.
+2. Pull, so that the system has the current Exercise 09 state.
 3. Check that no local changes are pending (no diff icon in abapGit).
 
 ---
 
-## 2. Add the new fields to the CDS view
+## 2. Add the new status fields to the CDS view
 
-In `ZCDS_UX403_SADL_00`, add the two fields to the projection list, for example after `TaxAmount`:
+In `ZCDS_UX403_SADL_00`, add the three fields after `OverallStatus`:
 
 ```abap
       SalesOrderOverallStatus        as OverallStatus,
 
+      SalesOrderBillingStatus        as BillingStatus,
+
+      SalesOrderDeliveryStatus       as DeliveryStatus,
+
+      SalesOrderLifeCycleStatus      as LifeCycleStatus,
+
       SalesOrderPaymentMethod        as PaymentMethod,
+
+      _CustomerVH
+}
 ```
 
-> The source field names `SalesOrderOverallStatus` and `SalesOrderPaymentMethod` were verified in `SEPM_I_SalesOrder` in ADT.
+> **Verify the source field names first.** `SalesOrderBillingStatus`, `SalesOrderDeliveryStatus` and `SalesOrderLifeCycleStatus` are the expected names in `SEPM_I_SalesOrder` (same pattern as `SalesOrderOverallStatus`), but they have not been checked in the system yet. Use code completion (Ctrl+Space) and adjust if needed.
 
-Activate the CDS view.
+Check (Ctrl+F2), activate (Ctrl+F3) and use the Data Preview (F8) to see whether the status fields contain data.
 
 ---
 
-## 3. Add identification annotations to the Metadata Extension
+## 3. Update the Metadata Extension
 
-In `ZCDS_UX403_SADL_00_UI`, add `@UI.identification` to each field. Keep the existing `@UI.lineItem` and `@UI.selectionField` annotations. Reuse the List Report labels for a consistent UI.
+Below is the **complete** target source of `ZCDS_UX403_SADL_00_UI`. It keeps every annotation from Ex06–Ex09 and adds:
+
+- two header facets in `@UI.facet`
+- `@UI.fieldGroup` for `AMOUNT` and `STATUS`
+- the three new status fields
 
 ```abap
+@Metadata.layer: #CORE
+
+@UI.headerInfo: { typeName: 'Sales Order',
+                  typeNamePlural: 'Sales Orders',
+                  title: { type: #STANDARD, value: 'SalesOrderID' } }
+
+annotate view ZCDS_UX403_SADL_00 with
+
+{
+  @UI.facet: [ /* Ex10: header facets */
+               { purpose:         #HEADER,
+                 type:            #FIELDGROUP_REFERENCE,
+                 targetQualifier: 'AMOUNT',
+                 label:           'Amounts',
+                 position:        10 },
+               { purpose:         #HEADER,
+                 type:            #FIELDGROUP_REFERENCE,
+                 targetQualifier: 'STATUS',
+                 label:           'Status',
+                 position:        20 },
+               /* Ex09: content section */
+               { id:       'COLLFAC1',
+                 type:     #COLLECTION,
+                 label:    'General Information',
+                 position: 10 },
+               { type:     #IDENTIFICATION_REFERENCE,
+                 label:    'General Information',
+                 parentId: 'COLLFAC1',
+                 position: 10 } ]
   @UI.lineItem:       [ { position: 10, importance: #HIGH, label: 'Sales Order ID' } ]
   @UI.identification: [ { position: 10, label: 'Sales Order ID' } ]
   SalesOrderID;
@@ -221,14 +236,26 @@ In `ZCDS_UX403_SADL_00_UI`, add `@UI.identification` to each field. Keep the exi
 
   @UI.lineItem:       [ { position: 40, importance: #HIGH, label: 'Gross Amount' } ]
   @UI.identification: [ { position: 40, label: 'Gross Amount' } ]
+  @UI.fieldGroup:     [ { qualifier: 'AMOUNT', position: 10, label: 'Gross Amount' } ]
   GrossAmount;
 
   @UI.lineItem:       [ { position: 50, importance: #HIGH, label: 'Net Amount' } ]
   @UI.identification: [ { position: 50, label: 'Net Amount' } ]
+  @UI.fieldGroup:     [ { qualifier: 'AMOUNT', position: 20, label: 'Net Amount' } ]
   NetAmount;
 
   @UI.identification: [ { position: 60, label: 'Overall Status' } ]
+  @UI.fieldGroup:     [ { qualifier: 'STATUS', position: 10, label: 'Overall Status' } ]
   OverallStatus;
+
+  @UI.fieldGroup:     [ { qualifier: 'STATUS', position: 20, label: 'Billing Status' } ]
+  BillingStatus;
+
+  @UI.fieldGroup:     [ { qualifier: 'STATUS', position: 30, label: 'Delivery Status' } ]
+  DeliveryStatus;
+
+  @UI.fieldGroup:     [ { qualifier: 'STATUS', position: 40, label: 'Life Cycle Status' } ]
+  LifeCycleStatus;
 
   @UI.identification: [ { position: 70, label: 'Payment Method' } ]
   PaymentMethod;
@@ -238,35 +265,20 @@ In `ZCDS_UX403_SADL_00_UI`, add `@UI.identification` to each field. Keep the exi
 
   @UI.lineItem:       [ { position: 80, importance: #LOW, label: 'Tax Amount' } ]
   TaxAmount;
+}
 ```
 
-> `@UI.lineItem` and `@UI.identification` positions are independent of each other. `TaxAmount` was moved from line-item position 60 to 80; it remains the last List Report column, so the List Report looks the same.
+Notes:
 
----
-
-## 4. Add the facets to the Metadata Extension
-
-Add `@UI.facet` on `SalesOrderID`:
-
-```abap
-  @UI.facet: [ { id:       'COLLFAC1',
-                 type:     #COLLECTION,
-                 label:    'General Information',
-                 position: 10 },
-               { type:     #IDENTIFICATION_REFERENCE,
-                 label:    'General Information',
-                 parentId: 'COLLFAC1',
-                 position: 10 } ]
-  @UI.lineItem:       [ { position: 10, importance: #HIGH, label: 'Sales Order ID' } ]
-  @UI.identification: [ { position: 10, label: 'Sales Order ID' } ]
-  SalesOrderID;
-```
+- Header facet positions (10, 20) and content facet positions (10) are separate: `purpose: #HEADER` facets are ordered among themselves.
+- The `label` of a header facet is the heading shown above the field group in the header.
+- If the `/* */` comments inside the annotation array cause a syntax error, remove them.
 
 Activate the Metadata Extension.
 
 ---
 
-## 5. Verify the OData service
+## 4. Verify the OData service
 
 Service:
 
@@ -274,57 +286,54 @@ Service:
 ZCDS_UX403_SADL_00_CDS
 ```
 
-Check `$metadata` and the entity set:
+Check `$metadata` and the annotation model `ZCDS_UX403_SADL_00_CDS_VAN`:
 
-- the entity type contains `OverallStatus` and `PaymentMethod`
-- the annotations contain `UI.Identification` and `UI.Facets` (look in the annotation model `ZCDS_UX403_SADL_00_CDS_VAN`)
+- the entity type contains `BillingStatus`, `DeliveryStatus` and `LifeCycleStatus`
+- `UI.FieldGroup#AMOUNT` and `UI.FieldGroup#STATUS` exist
+- `UI.HeaderFacets` contains two `UI.ReferenceFacet` entries
 
-If the old metadata is still returned, clear the metadata cache (`/IWFND/CACHE_CLEANUP` on the hub, `/IWBEP/CACHE_CLEANUP` on the backend) and reload.
+If the old metadata is still returned, clear the metadata cache (`/IWFND/CACHE_CLEANUP`, `/IWBEP/CACHE_CLEANUP`) and reload.
 
 ---
 
-## 6. Push the backend to GitHub
+## 5. Push the backend to GitHub
 
 In abapGit:
 
 1. Stage the changed objects (CDS view, Metadata Extension and any changed service files).
-2. Commit, for example: `Ex09: add object page facets and identification`.
-3. Push to `ux403-ex09-object-page`.
+2. Commit, for example: `Ex10: add field groups and header facets`.
+3. Push to `ux403-ex10-header-facets`.
 
 > Commits made directly on GitHub that only change files outside `src/` (for example this README) do not require a pull in abapGit before the next push.
 
 ---
 
-## 7. Validate in the Fiori Elements application
+## 6. Validate in the Fiori Elements application
 
-Use the existing application in SAP Business Application Studio, connected to the company sandbox through the BTP Destination and SAP Cloud Connector. Do not generate a new application.
+Use the existing application in SAP Business Application Studio. Do not generate a new application.
 
 1. Start the application and choose **Go**.
 2. Select a sales order row.
-3. Check the Object Page:
-   - header shows *Sales Order* and the `SalesOrderID`
-   - section **General Information** exists
-   - fields are shown in the order 10–70, including `OverallStatus` and `PaymentMethod`
-
-> If selecting a row does not navigate, check that the existing app was created with the *List Report Object Page* template and that `manifest.json` contains the Object Page route and target.
-
----
-
-## 8. Regression-test Exercises 07 and 08
-
-Verify that the List Report still provides:
-
-- all existing line items, labels and responsive `TaxAmount`
-- `TaxAmount` currency formatting and hidden `CurrencyCode`
-- free-text search across the four searchable fields
-- filter fields `CustomerID` and `CreationDate`
-- Customer value help on `CustomerID`
-
-The new fields `OverallStatus` and `PaymentMethod` should **not** appear as List Report columns, because they have no `@UI.lineItem` annotation.
+3. Check the Object Page header:
+   - title *Sales Order* and `SalesOrderID` as before
+   - header facet **Amounts** with Gross Amount and Net Amount (with currency)
+   - header facet **Status** with Overall, Billing, Delivery and Life Cycle Status, in this order
+4. Refresh the browser (Ctrl+Shift+R) if the header does not change.
 
 ---
 
-## Architecture After Exercise 09
+## 7. Regression-test Exercises 07 to 09
+
+Verify that:
+
+- the List Report columns are unchanged; the new status fields do **not** appear as columns
+- search, filter fields `CustomerID` and `CreationDate`, and the Customer value help still work
+- the Object Page section **General Information** still shows the fields 10–70
+- the new status fields do **not** appear in *General Information* (they have no `@UI.identification`)
+
+---
+
+## Architecture After Exercise 10
 
 ```text
 ZCDS_UX403_SADL_00
@@ -332,15 +341,17 @@ ZCDS_UX403_SADL_00
         |-- search semantics
         |-- value-help association
         |-- amount/currency semantics
-        |-- business fields (+ OverallStatus, PaymentMethod)
+        |-- business fields (+ Billing/Delivery/LifeCycle status)
         |
         +---- ZCDS_UX403_SADL_00_UI
         |       |
-        |       |-- header (List Report + Object Page)
-        |       |-- line items
-        |       |-- selection fields
-        |       |-- identification            <- new
-        |       |-- facets                    <- new
+        |       |-- header info
+        |       |-- line items / selection fields
+        |       |-- identification
+        |       |-- field groups AMOUNT, STATUS   <- new
+        |       |-- facets
+        |       |     |-- header facets           <- new
+        |       |     +-- General Information
         |       +-- visibility / importance
         |
         v
@@ -348,49 +359,24 @@ ZCDS_UX403_SADL_00_CDS
         |
         v
 Fiori Elements application
-  List Report  --select row-->  Object Page
+  List Report  --select row-->  Object Page (header facets + sections)
 ```
 
 ---
 
-## Exercise 09 Status
+## Exercise 10 Status
 
-**Exercise 09 completed.**
+Planned:
 
-- ✅ branch switched and pulled in the development system
-- ✅ source field names verified in `SEPM_I_SalesOrder`
-- ✅ `OverallStatus` and `PaymentMethod` added to the CDS view
-- ✅ `@UI.identification` added (positions 10–70)
-- ✅ `@UI.facet` added (collection + identification reference)
-- ✅ CDS view and Metadata Extension activated
-- ✅ backend pushed to GitHub with abapGit
-- ✅ Object Page validated in the Fiori Elements application
-- ✅ Exercises 07 and 08 regression-tested (including the restored `CreationDate` filter)
-
-Open points:
-
-- `PaymentMethod` has no data in the demo system (see *Known Data Limitation*).
-
----
-
-## Next Exercise
-
-```text
-Exercise 10
-Add Header Facets
-```
-
-Create the next branch from:
-
-```text
-ux403-ex09-object-page
-```
-
-Expected branch:
-
-```text
-ux403-ex10-header-facets
-```
+- [ ] branch switched and pulled in the development system
+- [ ] source field names verified in `SEPM_I_SalesOrder`
+- [ ] `BillingStatus`, `DeliveryStatus`, `LifeCycleStatus` added to the CDS view
+- [ ] `@UI.fieldGroup` AMOUNT and STATUS added
+- [ ] header facets added to `@UI.facet`
+- [ ] CDS view and Metadata Extension activated
+- [ ] backend pushed to GitHub with abapGit
+- [ ] header facets validated in the Fiori Elements application
+- [ ] Exercises 07 to 09 regression-tested
 
 ---
 
@@ -406,6 +392,8 @@ main
                 +-- ux403-ex08-search-filter
                        |
                        +-- ux403-ex09-object-page
+                              |
+                              +-- ux403-ex10-header-facets
 ```
 
 Each exercise branch represents the cumulative application state at that stage of the UX403 training.
@@ -414,4 +402,4 @@ Each exercise branch represents the cumulative application state at that stage o
 
 ## Source
 
-Exercise content based on *UX403, Unit 4, Exercise 9: Build a Basic Object Page with CDS Annotation*. The course material is not part of this repository.
+Exercise content based on *UX403, Unit 4, Exercise 10: Add Header Facets*. The course material is not part of this repository.
